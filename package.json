@@ -1,5 +1,5 @@
 {
-  "name": "@mostafarde/eloquent-orm-node",
+  "name": "eloquent-orm-node",
   "version": "0.1.0",
   "description": "Eloquent ORM for Node JS",
   "main": "index.js",
