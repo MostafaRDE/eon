@@ -2,6 +2,7 @@
   "name": "eloquent-orm-node",
   "version": "1.0.0",
   "description": "Eloquent ORM for Node JS",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc src/index.ts"
