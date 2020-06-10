@@ -1,0 +1,22 @@
+{
+  "name": "eloquent-orm-node",
+  "version": "1.0.0",
+  "description": "Eloquent ORM for Node JS",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc src/index.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MostafaRDE/eloquent-orm-node.git"
+  },
+  "author": "Mostafa Rostam Dokht Effati",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/MostafaRDE/eloquent-orm-node/issues"
+  },
+  "homepage": "https://github.com/MostafaRDE/eloquent-orm-node#readme",
+  "devDependencies": {
+    "typescript": "^3.9.5"
+  }
+}
