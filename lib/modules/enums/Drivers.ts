@@ -1,5 +1,5 @@
 enum Drivers {
-    'POSTGRES',
+    'postgres',
 }
 
 export default Drivers

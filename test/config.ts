@@ -3,7 +3,7 @@ import Drivers from '../lib/modules/enums/Drivers'
 export default {
     connection1: {
         development: {
-            driver: Drivers.POSTGRES,
+            driver: Drivers.postgres,
             host: '127.0.0.1',
             port: 5432,
             username: 'postgres',
@@ -11,7 +11,7 @@ export default {
             database: '',
         },
         test: {
-            driver: Drivers.POSTGRES,
+            driver: Drivers.postgres,
             host: '127.0.0.1',
             port: 5432,
             username: 'postgres',
@@ -19,7 +19,7 @@ export default {
             database: '',
         },
         production: {
-            driver: Drivers.POSTGRES,
+            driver: Drivers.postgres,
             host: '127.0.0.1',
             port: 5432,
             username: 'postgres',
