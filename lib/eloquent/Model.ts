@@ -10,6 +10,9 @@ export namespace DB
 
     export abstract class Model
     {
+        parser(): void
+        {
 
+        }
     }
 }

@@ -5,8 +5,10 @@ export namespace DB
         clearConnection(): void
         connect(): boolean
         disconnect(): boolean
-        getConnection(): IConnection
+        getConnection()
+        getOptions(): object
         isConnected(): boolean
         restartConnection(): void
+        setOptions(options: object): void
     }
 }

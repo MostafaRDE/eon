@@ -11,7 +11,10 @@
     "type": "git",
     "url": "git+https://github.com/MostafaRDE/eloquent-orm-node.git"
   },
-  "author": "Mostafa Rostam Dokht Effati",
+  "author": {
+    "name": "Mostafa Rostam Dokht Effati",
+    "email": "mostafa.rostamdokht@gmail.com"
+  },
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/MostafaRDE/eloquent-orm-node/issues"
@@ -21,6 +24,7 @@
     "typescript": "^3.9.5"
   },
   "dependencies": {
-    "@types/node": "^14.0.13"
+    "@types/node": "^14.0.13",
+    "pg": "^8.2.1"
   }
 }
