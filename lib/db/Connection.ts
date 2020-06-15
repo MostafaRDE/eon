@@ -11,6 +11,7 @@ export namespace DB
         implements IConnection, IQueryBuilder
     {
         protected _connection = null
+
         protected options: {
             driver: Drivers,
             host: string,
@@ -33,8 +34,26 @@ export namespace DB
                 this.setOptions(options)
         }
 
+        getOptions(): object
+        {
+            return this.options;
+        }
+
+        setOptions(options: {
+            driver: Drivers,
+            host: string,
+            port?: string | number,
+            username?: string,
+            password?: string,
+            database: string,
+        }): void
+        {
+            this.options = options
+        }
+
 
         // DB.IConnection
+        // <editor-fold desc="Connection Methods">
 
         clearConnection(): void
         {
@@ -54,77 +73,39 @@ export namespace DB
 
         abstract restartConnection(): void
 
-        abstract all(): [] | object;
+        // </editor-fold>
 
-        abstract crossJoin(): IQueryBuilder;
+        // <editor-fold desc="Queries Methods">
 
-        abstract delete(): boolean;
+        abstract parseResultQuery(result: any): object|[]
 
-        abstract find(): [] | object;
-
-        abstract first(): IQueryBuilder;
+        abstract table(tableName: string): IQueryBuilder;
 
         abstract get(): [] | object;
 
-        abstract groupBy(): IQueryBuilder;
+        abstract select(...args: string[]): IQueryBuilder;
 
-        abstract having(): IQueryBuilder;
+        abstract distinct(status: boolean): IQueryBuilder;
 
-        abstract innerJoin(): IQueryBuilder;
+        abstract where(...args: object[]): IQueryBuilder;
 
-        abstract insert(): IQueryBuilder;
+        abstract orderBy(...args: string[]): IQueryBuilder;
 
-        abstract join(): IQueryBuilder;
-
-        abstract latest(): IQueryBuilder;
-
-        abstract leftJoin(): IQueryBuilder;
-
-        abstract orWhere(): IQueryBuilder;
-
-        abstract orderBy(): IQueryBuilder;
-
-        abstract rightJoin(): IQueryBuilder;
-
-        abstract select(): IQueryBuilder;
-
-        abstract table(): IQueryBuilder;
-
-        abstract union(): IQueryBuilder;
+       abstract insert(): IQueryBuilder;
 
         abstract update(): boolean;
 
-        abstract where(): IQueryBuilder;
+        abstract delete(): boolean;
 
-        abstract whereBetween(): IQueryBuilder;
+        // </editor-fold>
 
-        abstract whereIn(): IQueryBuilder;
+        // <editor-fold desc="Executor Methods">
 
-        abstract whereNotBetween(): IQueryBuilder;
+        abstract getQuery(): string
 
-        abstract whereNotIn(): IQueryBuilder;
+        abstract raw(query?: string): any
 
-        abstract whereNotNull(): IQueryBuilder;
+        // </editor-fold>
 
-        abstract whereNull(): IQueryBuilder;
-
-        getOptions(): object
-        {
-            return this.options;
-        }
-
-        setOptions(options: {
-            driver: Drivers,
-            host: string,
-            port?: string | number,
-            username?: string,
-            password?: string,
-            database: string,
-        }): void
-        {
-            this.options = options
-        }
-
-        // DB.IQueryBuilder
     }
 }

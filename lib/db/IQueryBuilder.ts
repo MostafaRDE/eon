@@ -2,54 +2,29 @@ export namespace DB
 {
     export interface IQueryBuilder
     {
+        getQuery(): string
+
+        raw(query?: string): any
+
+
         // Collection
-        table(): IQueryBuilder
+        parseResultQuery(result: any): object|[]
 
 
         // Query
+        table(tableName: string): IQueryBuilder
+
         get(): [] | object
 
-        all(): [] | object
+        select(...args: string[]): IQueryBuilder
 
-        select(): IQueryBuilder
+        distinct(status: boolean): IQueryBuilder
 
-        find(): [] | object
-
-        first(): IQueryBuilder
-
-        latest(): IQueryBuilder
-
-        where(): IQueryBuilder
-
-        whereBetween(): IQueryBuilder
-
-        whereNotBetween(): IQueryBuilder
-
-        whereIn(): IQueryBuilder
-
-        whereNotIn(): IQueryBuilder
-
-        whereNull(): IQueryBuilder
-
-        whereNotNull(): IQueryBuilder
-
-        orWhere(): IQueryBuilder
-
-        join(): IQueryBuilder
-
-        crossJoin(): IQueryBuilder
-
-        innerJoin(): IQueryBuilder
-
-        leftJoin(): IQueryBuilder
-
-        rightJoin(): IQueryBuilder
-
-        union(): IQueryBuilder
+        where(...args: object[]): IQueryBuilder
 
 
         // Sorting
-        orderBy(): IQueryBuilder
+        orderBy(...args: string[]): IQueryBuilder
 
 
         // Mutations
@@ -58,11 +33,5 @@ export namespace DB
         update(): boolean
 
         delete(): boolean
-
-
-        // Computational
-        groupBy(): IQueryBuilder
-
-        having(): IQueryBuilder
     }
 }

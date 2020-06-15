@@ -12,7 +12,7 @@ export namespace DB
     export class DB implements IQueryBuilder
     {
         private options: object
-        private connection: Connection = null
+        private readonly connection: Connection = null
 
         constructor(options: {
             driver: Drivers,
@@ -48,36 +48,18 @@ export namespace DB
             }
         }
 
-        all(): [] | object
+        // <editor-fold desc="Queries Methods">
+
+        parseResultQuery(result: any): object|[]
         {
-            if (this.connectionChecker())
-            {
-                return {}
-            }
-            else
-            {
-                throw ''
-            }
+            this.connection.parseResultQuery(result)
+            return this;
         }
 
-        crossJoin(): IQueryBuilder
+        table(tableName: string): IQueryBuilder
         {
-            return undefined;
-        }
-
-        delete(): boolean
-        {
-            return false;
-        }
-
-        find(): [] | object
-        {
-            return undefined;
-        }
-
-        first(): IQueryBuilder
-        {
-            return undefined;
+            this.connection.table(tableName)
+            return this;
         }
 
         get(): [] | object
@@ -85,67 +67,31 @@ export namespace DB
             return undefined;
         }
 
-        groupBy(): IQueryBuilder
+        select(...args: string[]): IQueryBuilder
         {
-            return undefined;
+            this.connection.select(...args)
+            return this;
         }
 
-        having(): IQueryBuilder
+        distinct(status: boolean = true): IQueryBuilder
         {
-            return undefined;
+            this.connection.distinct(status)
+            return this;
         }
 
-        innerJoin(): IQueryBuilder
+        where(...args: {key: string, operator?: string, value: string, condition?: string}[]): IQueryBuilder
         {
-            return undefined;
+            this.connection.where(...args)
+            return this;
+        }
+
+        orderBy(...args: string[]): IQueryBuilder
+        {
+            this.connection.orderBy(...args)
+            return this;
         }
 
         insert(): IQueryBuilder
-        {
-            return undefined;
-        }
-
-        join(): IQueryBuilder
-        {
-            return undefined;
-        }
-
-        latest(): IQueryBuilder
-        {
-            return undefined;
-        }
-
-        leftJoin(): IQueryBuilder
-        {
-            return undefined;
-        }
-
-        orWhere(): IQueryBuilder
-        {
-            return undefined;
-        }
-
-        orderBy(): IQueryBuilder
-        {
-            return undefined;
-        }
-
-        rightJoin(): IQueryBuilder
-        {
-            return undefined;
-        }
-
-        select(): IQueryBuilder
-        {
-            return undefined;
-        }
-
-        table(): IQueryBuilder
-        {
-            return undefined;
-        }
-
-        union(): IQueryBuilder
         {
             return undefined;
         }
@@ -155,39 +101,25 @@ export namespace DB
             return false;
         }
 
-        where(): IQueryBuilder
+        delete(): boolean
         {
-            return undefined;
+            return false;
         }
 
-        whereBetween(): IQueryBuilder
+        // </editor-fold>
+
+        // <editor-fold desc="Executor Methods">
+
+        getQuery(): string
         {
-            return undefined;
+            return this.connection.getQuery();
         }
 
-        whereIn(): IQueryBuilder
+        raw(query?: string): any
         {
-            return undefined;
+            return this.connection.raw(query);
         }
 
-        whereNotBetween(): IQueryBuilder
-        {
-            return undefined;
-        }
-
-        whereNotIn(): IQueryBuilder
-        {
-            return undefined;
-        }
-
-        whereNotNull(): IQueryBuilder
-        {
-            return undefined;
-        }
-
-        whereNull(): IQueryBuilder
-        {
-            return undefined;
-        }
+        // </editor-fold>
     }
 }

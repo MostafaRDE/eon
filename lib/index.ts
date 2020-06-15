@@ -1,8 +1,15 @@
 import * as DB from './db/DB'
-import Drivers from "./modules/enums/Drivers";
+import config from '../test/config'
+import * as IQueryBuilderImporter from "./db/IQueryBuilder";
+import IQueryBuilder = IQueryBuilderImporter.DB.IQueryBuilder;
 
-let a = new DB.DB.DB({
-    database: "ejareyi", driver: Drivers.postgres, host: "127.0.0.1", password: "root", port: undefined, username: "postgres"
-})
+let con: IQueryBuilder = new DB.DB.DB(config.connection1.development)
 
-// console.log(a.co)
+con = con.table('users').select('*')
+    .where(
+        {key: 'id', operator: '<>', value: `'1'`, condition: 'OR'},
+        {key: 'id', operator: '<>', value: `'2'`, condition: 'OR'}
+        )
+
+// con.raw('SELECT NOW()').then(res => console.log(res.rows))
+console.log(con.getQuery())

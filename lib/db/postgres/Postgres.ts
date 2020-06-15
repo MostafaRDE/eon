@@ -11,6 +11,15 @@ export namespace DB.postgres
     export class Postgres extends Connection
     {
         _isConnected = false
+        client = null
+
+        query = {
+            table: '',
+            distinct: false,
+            select: [],
+            where: [],
+            orderBy: [],
+        }
 
         constructor(options?: {
             driver: Drivers,
@@ -26,6 +35,8 @@ export namespace DB.postgres
             this.connect()
         }
 
+        // <editor-fold desc="Connection Methods">
+
         clearConnection()
         {
             if (this._connection)
@@ -37,17 +48,22 @@ export namespace DB.postgres
         {
             try
             {
-                this._connection.connect((err, client, release) => {
-                    if (err) {
+                this._connection.connect((err, client, release) =>
+                {
+                    if (err)
+                    {
                         this._isConnected = false
                         return console.error('Error acquiring client', err.stack)
                     }
-                    client.query('SELECT NOW()', (err, result) => {
+                    client.query('SELECT NOW()', (err, result) =>
+                    {
                         release()
-                        if (err) {
+                        if (err)
+                        {
                             this._isConnected = false
                             return console.error('Error executing query', err.stack)
                         }
+                        this.client = client
                         this._isConnected = true
                     })
                 })
@@ -72,83 +88,6 @@ export namespace DB.postgres
             return false;
         }
 
-        // Query Builder
-
-        all(): [] | object
-        {
-            return undefined;
-        }
-
-        crossJoin(): IQueryBuilder
-        {
-            return undefined;
-        }
-
-        delete(): boolean
-        {
-            return false;
-        }
-
-        find(): [] | object
-        {
-            return [];
-        }
-
-        first(): IQueryBuilder
-        {
-            return undefined;
-        }
-
-        get(): [] | object
-        {
-            return [];
-        }
-
-        groupBy(): IQueryBuilder
-        {
-            return undefined;
-        }
-
-        having(): IQueryBuilder
-        {
-            return undefined;
-        }
-
-        innerJoin(): IQueryBuilder
-        {
-            return undefined;
-        }
-
-        insert(): IQueryBuilder
-        {
-            return undefined;
-        }
-
-        join(): IQueryBuilder
-        {
-            return undefined;
-        }
-
-        latest(): IQueryBuilder
-        {
-            return undefined;
-        }
-
-        leftJoin(): IQueryBuilder
-        {
-            return undefined;
-        }
-
-        orWhere(): IQueryBuilder
-        {
-            return undefined;
-        }
-
-        orderBy(): IQueryBuilder
-        {
-            return undefined;
-        }
-
         restartConnection(): void
         {
             this.clearConnection()
@@ -161,22 +100,46 @@ export namespace DB.postgres
             });
         }
 
-        rightJoin(): IQueryBuilder
+        // </editor-fold>
+
+        // <editor-fold desc="Queries Methods">
+
+        table(tableName: string): IQueryBuilder
         {
-            return undefined;
+            this.query.table = tableName
+            return this
         }
 
-        select(): IQueryBuilder
+        get(): [] | object
         {
-            return undefined;
+            return [];
         }
 
-        table(): IQueryBuilder
+        select(...args: string[]): IQueryBuilder
         {
-            return undefined;
+            args.forEach(item => this.query.select.push(item))
+            return this;
         }
 
-        union(): IQueryBuilder
+        distinct(status: boolean): IQueryBuilder
+        {
+            this.query.distinct = status
+            return this;
+        }
+
+        where(...args: {key: string, operator?: string, value: string, condition?: string}[]): IQueryBuilder
+        {
+            args.forEach(item => this.query.where.push(item))
+            return this;
+        }
+
+        orderBy(...args: string[]): IQueryBuilder
+        {
+            args.forEach(item => this.query.select.push(item))
+            return this;
+        }
+
+        insert(): IQueryBuilder
         {
             return undefined;
         }
@@ -186,40 +149,51 @@ export namespace DB.postgres
             return false;
         }
 
-        where(): IQueryBuilder
+        delete(): boolean
+        {
+            return false;
+        }
+
+        // </editor-fold>
+
+        // <editor-fold desc="Executor Methods">
+
+        getQuery(): string
+        {
+            let query = '';
+            let select = `${this.query.distinct ? 'DISTINCT' : ''}${this.query.select.join(', ')}`;
+            query += `SELECT ${select} FROM ${this.query.table}`;
+            if (this.query.where.length) {
+                let where: any = this.query.where.map((item, index) => `${item.key} ${item.operator || '='} ${item.value}${index + 1 < this.query.where.length ? (` ${item.condition}` || ' AND') : ''}`).join(' ')
+                query += ` ${where} `
+            }
+            return query;
+        }
+
+        raw(query?: string): any
+        {
+            return new Promise((resolve, reject) => {
+                this._connection.query(query, (err, result) =>
+                {
+                    if (err)
+                    {
+                        this._isConnected = false
+                        reject(err)
+                        return console.error('Error executing query => ', err.stack)
+                    }
+                    else
+                    {
+                        resolve(result)
+                    }
+                })
+            })
+        }
+
+        parseResultQuery(result: any): object | []
         {
             return undefined;
         }
 
-        whereBetween(): IQueryBuilder
-        {
-            return undefined;
-        }
-
-        whereIn(): IQueryBuilder
-        {
-            return undefined;
-        }
-
-        whereNotBetween(): IQueryBuilder
-        {
-            return undefined;
-        }
-
-        whereNotIn(): IQueryBuilder
-        {
-            return undefined;
-        }
-
-        whereNotNull(): IQueryBuilder
-        {
-            return undefined;
-        }
-
-        whereNull(): IQueryBuilder
-        {
-            return undefined;
-        }
-
+        // </editor-fold>
     }
 }

@@ -8,7 +8,7 @@ export default {
             port: 5432,
             username: 'postgres',
             password: 'root',
-            database: '',
+            database: 'ejareyi',
         },
         test: {
             driver: Drivers.postgres,
