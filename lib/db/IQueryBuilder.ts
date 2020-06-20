@@ -14,7 +14,7 @@ export namespace DB
         // Query
         table(tableName: string): IQueryBuilder
 
-        get(): [] | object
+        get(): Promise<[] | object>
 
         select(...args: string[]): IQueryBuilder
 

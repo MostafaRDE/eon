@@ -11,6 +11,7 @@ export namespace DB
         implements IConnection, IQueryBuilder
     {
         protected _connection = null
+        protected query = {}
 
         protected options: {
             driver: Drivers,
@@ -81,7 +82,7 @@ export namespace DB
 
         abstract table(tableName: string): IQueryBuilder;
 
-        abstract get(): [] | object;
+        abstract get(): Promise<[] | object>;
 
         abstract select(...args: string[]): IQueryBuilder;
 

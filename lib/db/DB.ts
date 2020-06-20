@@ -62,9 +62,9 @@ export namespace DB
             return this;
         }
 
-        get(): [] | object
+        get(): Promise<[] | object>
         {
-            return undefined;
+            return this.connection.get();
         }
 
         select(...args: string[]): IQueryBuilder

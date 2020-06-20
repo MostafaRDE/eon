@@ -11,7 +11,6 @@ export namespace DB.postgres
     export class Postgres extends Connection
     {
         _isConnected = false
-        client = null
 
         query = {
             table: '',
@@ -63,7 +62,6 @@ export namespace DB.postgres
                             this._isConnected = false
                             return console.error('Error executing query', err.stack)
                         }
-                        this.client = client
                         this._isConnected = true
                     })
                 })
@@ -110,9 +108,12 @@ export namespace DB.postgres
             return this
         }
 
-        get(): [] | object
+        get(): Promise<[] | object>
         {
-            return [];
+
+            return this.raw(this.getQuery())
+                .then(res => this.parseResultQuery(res))
+
         }
 
         select(...args: string[]): IQueryBuilder
@@ -191,7 +192,7 @@ export namespace DB.postgres
 
         parseResultQuery(result: any): object | []
         {
-            return undefined;
+            return result.rows;
         }
 
         // </editor-fold>
