@@ -33,7 +33,7 @@ export namespace DB
             }
         }
 
-        connectionChecker()
+        connectionChecker(): boolean
         {
             if (this.connection)
             {
@@ -91,12 +91,12 @@ export namespace DB
             return this;
         }
 
-        insert(): IQueryBuilder
+        insert(items: [], options: object): any
         {
             return undefined;
         }
 
-        update(): boolean
+        update(items: [], options: object): boolean
         {
             return false;
         }
@@ -115,9 +115,19 @@ export namespace DB
             return this.connection.getQuery();
         }
 
-        raw(query?: string): any
+        raw(query: string): any
         {
-            return this.connection.raw(query);
+            if (this.connectionChecker())
+                return this.connection.raw(query);
+        }
+
+        // </editor-fold>
+
+        // <editor-fold desc="Debugging Methods">
+
+        logger(): any
+        {
+
         }
 
         // </editor-fold>

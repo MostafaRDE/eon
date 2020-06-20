@@ -4,7 +4,7 @@ export namespace DB
     {
         getQuery(): string
 
-        raw(query?: string): any
+        raw(query: string): any
 
 
         // Collection
@@ -28,10 +28,14 @@ export namespace DB
 
 
         // Mutations
-        insert(): IQueryBuilder
+        insert(items: [], options: object): any
 
-        update(): boolean
+        update(items: [], options: object): boolean
 
         delete(): boolean
+
+
+        // Debugging
+        logger(): any
     }
 }

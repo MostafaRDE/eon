@@ -140,12 +140,12 @@ export namespace DB.postgres
             return this;
         }
 
-        insert(): IQueryBuilder
+        insert(items: [], options: object): any
         {
             return undefined;
         }
 
-        update(): boolean
+        update(items: [], options: object): boolean
         {
             return false;
         }
@@ -171,7 +171,7 @@ export namespace DB.postgres
             return query;
         }
 
-        raw(query?: string): any
+        raw(query: string): any
         {
             return new Promise((resolve, reject) => {
                 this._connection.query(query, (err, result) =>
@@ -193,6 +193,15 @@ export namespace DB.postgres
         parseResultQuery(result: any): object | []
         {
             return result.rows;
+        }
+
+        // </editor-fold>
+
+        // <editor-fold desc="Debugging Methods">
+
+        logger(): any
+        {
+
         }
 
         // </editor-fold>

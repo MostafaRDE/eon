@@ -92,9 +92,9 @@ export namespace DB
 
         abstract orderBy(...args: string[]): IQueryBuilder;
 
-       abstract insert(): IQueryBuilder;
+       abstract insert(items: [], options: object): any;
 
-        abstract update(): boolean;
+        abstract update(items: [], options: object): boolean;
 
         abstract delete(): boolean;
 
@@ -104,7 +104,16 @@ export namespace DB
 
         abstract getQuery(): string
 
-        abstract raw(query?: string): any
+        abstract raw(query: string): any
+
+        // </editor-fold>
+
+        // <editor-fold desc="Debugging Methods">
+
+        logger(): any
+        {
+
+        }
 
         // </editor-fold>
 
