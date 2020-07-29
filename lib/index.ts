@@ -15,19 +15,3 @@ export default {
         ModelTypes,
     },
 }
-
-abstract class Index
-{
-    constructor()
-    {
-        console.log(this.constructor.call('table').table)
-    }
-    protected table = ''
-}
-
-class Class extends Index
-{
-    table = 'a'
-}
-
-new Class()
