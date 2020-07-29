@@ -1,8 +1,8 @@
 {
   "name": "eloquent-orm-node",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Eloquent ORM for Node JS",
-  "main": "dist/index.js",
+  "main": "index.js",
   "scripts": {
     "build": "tsc"
   },
@@ -12,7 +12,7 @@
   },
   "author": {
     "name": "Mostafa Rostam Dokht Effati",
-    "email": "mostafa.rostamdokht@gmail.com"
+    "email": "mostafa3.rostamdokht@gmail.com"
   },
   "license": "MIT",
   "bugs": {
