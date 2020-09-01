@@ -16,3 +16,11 @@ export function getConnection(options: IOptions)
 
     return connection
 }
+
+export function disconnect(): boolean
+{
+    if (connection)
+        connection = null
+
+    return true
+}

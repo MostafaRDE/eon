@@ -58,26 +58,30 @@ export default class DB implements IQueryBuilder
 
     select(...args: string[]): IQueryBuilder
     {
-        this.connection.select(...args)
-        return this
+        const _this = global.clone(this)
+        _this.connection.select(...args)
+        return _this
     }
 
     distinct(status = true): IQueryBuilder
     {
-        this.connection.distinct(status)
-        return this
+        const _this = global.clone(this)
+        _this.connection.distinct(status)
+        return _this
     }
 
     where(...args: {key: string, operator?: string, value: string, condition?: string}[]): IQueryBuilder
     {
-        this.connection.where(...args)
-        return this
+        const _this = global.clone(this)
+        _this.connection.where(...args)
+        return _this
     }
 
     orderBy(...args: string[]): IQueryBuilder
     {
-        this.connection.orderBy(...args)
-        return this
+        const _this = global.clone(this)
+        _this.connection.orderBy(...args)
+        return _this
     }
 
     insert(items: Record<string, any>, options?: Record<string, any>): any

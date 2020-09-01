@@ -1,7 +1,7 @@
 import Connection from '../Connection'
 import { IOptions } from '../Connection'
 import IQueryBuilder from '../IQueryBuilder'
-import { getConnection } from './Connection'
+import { disconnect, getConnection } from './Connection'
 const format = require('pg-format')
 
 const { Pool } = require('pg')
@@ -122,7 +122,7 @@ export default class Postgres extends Connection
 
     disconnect(): boolean
     {
-        return false
+        return disconnect()
     }
 
     restartConnection(): void
