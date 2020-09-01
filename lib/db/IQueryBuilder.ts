@@ -1,41 +1,38 @@
-export namespace DB
+export default interface IQueryBuilder
 {
-    export interface IQueryBuilder
-    {
-        getQuery(): string
+    getQuery(): string
 
-        raw(query: string): any
+    raw(query: string): Promise<any>
 
 
-        // Collection
-        parseResultQuery(result: any): object|[]
+    // Collection
+    parseResultQuery(result: any): Record<string, any> | []
 
 
-        // Query
-        table(tableName: string): IQueryBuilder
+    // Query
+    table(tableName: string): IQueryBuilder
 
-        get(): Promise<[] | object>
+    get(): Promise<Record<string, any> | Record<string, any>[]>
 
-        select(...args: string[]): IQueryBuilder
+    select(...args: string[]): IQueryBuilder
 
-        distinct(status: boolean): IQueryBuilder
+    distinct(status: boolean): IQueryBuilder
 
-        where(...args: object[]): IQueryBuilder
-
-
-        // Sorting
-        orderBy(...args: string[]): IQueryBuilder
+    where(...args: Record<string, any>[]): IQueryBuilder
 
 
-        // Mutations
-        insert(items: [], options: object): any
-
-        update(items: [], options: object): boolean
-
-        delete(): boolean
+    // Sorting
+    orderBy(...args: string[]): IQueryBuilder
 
 
-        // Debugging
-        logger(): any
-    }
+    // Mutations
+    insert(items: (Record<string, any> | Record<string, any>[]), options?: Record<string, any>): any
+
+    update(items: [], options: Record<string, any>): boolean
+
+    delete(): boolean
+
+
+    // Debugging
+    logger(): any
 }

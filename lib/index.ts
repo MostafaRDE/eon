@@ -1,15 +1,16 @@
-import * as DBImporter from "./db/DB"
-import * as IQueryBuilderImporter from "./db/IQueryBuilder"
-import * as ModelImporter from "./eloquent/Model"
-import Drivers from "./modules/enums/Drivers"
-import ModelTypes from "./modules/enums/ModelTypes"
+import './_helpers'
+import DB from './db/DB'
+import IQueryBuilder from './db/IQueryBuilder'
+import Model from './eloquent/Model'
+import Drivers from './modules/enums/Drivers'
+import ModelTypes from './modules/enums/ModelTypes'
 
 export default {
-    DB: DBImporter.DB.DB,
-    Model: ModelImporter.DB.Model,
-    interfaces: {
-        IQueryBuilder: IQueryBuilderImporter,
-    },
+    DB,
+    Model,
+    // interfaces: {
+    //     IQueryBuilder,
+    // },
     enums: {
         Drivers,
         ModelTypes,

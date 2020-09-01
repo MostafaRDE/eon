@@ -1,135 +1,124 @@
 import Drivers from '../modules/enums/Drivers'
-import * as ConnectionImporter from "./Connection";
-import * as IQueryBuilderImporter from "./IQueryBuilder";
-import * as PostgresConnectionImporter from "./postgres/Postgres";
+import Connection from './Connection'
+import { IOptions } from './Connection'
+import IQueryBuilder from './IQueryBuilder'
+import Postgres from './postgres/Postgres'
 
-export namespace DB
+export default class DB implements IQueryBuilder
 {
-    import Connection = ConnectionImporter.DB.Connection;
-    import IQueryBuilder = IQueryBuilderImporter.DB.IQueryBuilder;
-    import Postgres = PostgresConnectionImporter.DB.postgres.Postgres;
+    private options: IOptions
+    private readonly connection: Connection
 
-    export class DB implements IQueryBuilder
+    constructor(options: IOptions)
     {
-        private options: object
-        private readonly connection: Connection = null
+        this.options = options
 
-        constructor(options: {
-            driver: Drivers,
-            host: string,
-            port?: string | number,
-            username?: string,
-            password?: string,
-            database: string,
-        })
+        switch (options.driver)
         {
-            this.options = options
-
-            switch (options.driver)
-            {
-                case Drivers.postgres:
-                    this.connection = new Postgres(options)
-                    break
-            }
+            case Drivers.postgres:
+                this.connection = new Postgres(options)
+                break
         }
-
-        connectionChecker(): boolean
-        {
-            if (this.connection)
-            {
-                if (this.connection.isConnected())
-                    return true
-                else
-                    throw ''
-            }
-            else
-            {
-                throw ''
-            }
-        }
-
-        // <editor-fold desc="Queries Methods">
-
-        parseResultQuery(result: any): object|[]
-        {
-            this.connection.parseResultQuery(result)
-            return this;
-        }
-
-        table(tableName: string): IQueryBuilder
-        {
-            this.connection.table(tableName)
-            return this;
-        }
-
-        get(): Promise<[] | object>
-        {
-            return this.connection.get();
-        }
-
-        select(...args: string[]): IQueryBuilder
-        {
-            this.connection.select(...args)
-            return this;
-        }
-
-        distinct(status: boolean = true): IQueryBuilder
-        {
-            this.connection.distinct(status)
-            return this;
-        }
-
-        where(...args: {key: string, operator?: string, value: string, condition?: string}[]): IQueryBuilder
-        {
-            this.connection.where(...args)
-            return this;
-        }
-
-        orderBy(...args: string[]): IQueryBuilder
-        {
-            this.connection.orderBy(...args)
-            return this;
-        }
-
-        insert(items: [], options: object): any
-        {
-            return undefined;
-        }
-
-        update(items: [], options: object): boolean
-        {
-            return false;
-        }
-
-        delete(): boolean
-        {
-            return false;
-        }
-
-        // </editor-fold>
-
-        // <editor-fold desc="Executor Methods">
-
-        getQuery(): string
-        {
-            return this.connection.getQuery();
-        }
-
-        raw(query: string): any
-        {
-            if (this.connectionChecker())
-                return this.connection.raw(query);
-        }
-
-        // </editor-fold>
-
-        // <editor-fold desc="Debugging Methods">
-
-        logger(): any
-        {
-
-        }
-
-        // </editor-fold>
     }
+
+    connectionChecker(): boolean
+    {
+        if (this.connection)
+        {
+            if (this.connection.isConnected())
+                return true
+            else
+                throw ''
+        }
+        else
+        {
+            throw ''
+        }
+    }
+
+    // <editor-fold desc="Queries Methods">
+
+    parseResultQuery(result: any): Record<string, any>|[]
+    {
+        this.connection.parseResultQuery(result)
+        return this
+    }
+
+    table(tableName: string): IQueryBuilder
+    {
+        const _this = global.clone(this)
+        _this.connection.table(tableName)
+        return _this
+    }
+
+    get(): Promise<[] | Record<string, any>>
+    {
+        return this.connection.get()
+    }
+
+    select(...args: string[]): IQueryBuilder
+    {
+        this.connection.select(...args)
+        return this
+    }
+
+    distinct(status = true): IQueryBuilder
+    {
+        this.connection.distinct(status)
+        return this
+    }
+
+    where(...args: {key: string, operator?: string, value: string, condition?: string}[]): IQueryBuilder
+    {
+        this.connection.where(...args)
+        return this
+    }
+
+    orderBy(...args: string[]): IQueryBuilder
+    {
+        this.connection.orderBy(...args)
+        return this
+    }
+
+    insert(items: Record<string, any>, options?: Record<string, any>): any
+    {
+        const _this = global.clone(this)
+        return _this.connection.insert(items, options)
+    }
+
+    update(items: Record<string, any>, options?: Record<string, any>): boolean
+    {
+        const _this = global.clone(this)
+        return _this.connection.update(items, options)
+    }
+
+    delete(): boolean
+    {
+        return false
+    }
+
+    // </editor-fold>
+
+    // <editor-fold desc="Executor Methods">
+
+    getQuery(): string
+    {
+        return this.connection.getQuery()
+    }
+
+    raw(query: string): any
+    {
+        return this.connection.raw(query)
+    }
+
+    // </editor-fold>
+
+    // <editor-fold desc="Debugging Methods">
+
+    logger(): any
+    {
+        //
+    }
+
+    // </editor-fold>
 }

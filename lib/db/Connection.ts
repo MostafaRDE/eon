@@ -1,121 +1,111 @@
-import * as IConnectionImporter from './IConnection'
-import * as IQueryBuilderImporter from './IQueryBuilder'
-import Drivers from "../modules/enums/Drivers";
+import IConnection from './IConnection'
+import IQueryBuilder from './IQueryBuilder'
+import Drivers from '../modules/enums/Drivers'
 
-export namespace DB
+export interface IOptions
 {
-    import IConnection = IConnectionImporter.DB.IConnection
-    import IQueryBuilder = IQueryBuilderImporter.DB.IQueryBuilder
+    driver: Drivers
+    host: string
+    port?: string | number
+    username?: string
+    password?: string
+    database: string
+}
 
-    export abstract class Connection
-        implements IConnection, IQueryBuilder
-    {
-        protected _connection = null
-        protected query = {}
+export default abstract class Connection implements IConnection, IQueryBuilder
+{
+    protected _connection: any = null
+    protected _table: string = ''
+    protected query = {}
+    protected queryInsert = {}
+    protected queryUpdate = {}
+    protected queryDelete = {}
 
-        protected options: {
-            driver: Drivers,
-            host: string,
-            port?: string | number,
-            username?: string,
-            password?: string,
-            database: string,
-        } = null
-
-        protected constructor(options?: {
-            driver: Drivers,
-            host: string,
-            port?: string | number,
-            username?: string,
-            password?: string,
-            database: string,
-        })
-        {
-            if (options)
-                this.setOptions(options)
-        }
-
-        getOptions(): object
-        {
-            return this.options;
-        }
-
-        setOptions(options: {
-            driver: Drivers,
-            host: string,
-            port?: string | number,
-            username?: string,
-            password?: string,
-            database: string,
-        }): void
-        {
-            this.options = options
-        }
-
-
-        // DB.IConnection
-        // <editor-fold desc="Connection Methods">
-
-        clearConnection(): void
-        {
-            this._connection = null
-        }
-
-        abstract connect(): boolean
-
-        abstract disconnect(): boolean
-
-        getConnection()
-        {
-            return this
-        }
-
-        abstract isConnected(): boolean
-
-        abstract restartConnection(): void
-
-        // </editor-fold>
-
-        // <editor-fold desc="Queries Methods">
-
-        abstract parseResultQuery(result: any): object|[]
-
-        abstract table(tableName: string): IQueryBuilder;
-
-        abstract get(): Promise<[] | object>;
-
-        abstract select(...args: string[]): IQueryBuilder;
-
-        abstract distinct(status: boolean): IQueryBuilder;
-
-        abstract where(...args: object[]): IQueryBuilder;
-
-        abstract orderBy(...args: string[]): IQueryBuilder;
-
-       abstract insert(items: [], options: object): any;
-
-        abstract update(items: [], options: object): boolean;
-
-        abstract delete(): boolean;
-
-        // </editor-fold>
-
-        // <editor-fold desc="Executor Methods">
-
-        abstract getQuery(): string
-
-        abstract raw(query: string): any
-
-        // </editor-fold>
-
-        // <editor-fold desc="Debugging Methods">
-
-        logger(): any
-        {
-
-        }
-
-        // </editor-fold>
-
+    protected _options: IOptions = {
+        driver: Drivers.postgres,
+        host: '127.0.0.1',
+        database: 'test',
     }
+
+    protected constructor(options: IOptions)
+    {
+        if (options)
+            this.options = options
+    }
+
+    get options(): (IOptions)
+    {
+        return this._options
+    }
+
+    set options(options: IOptions)
+    {
+        this._options = options
+    }
+
+
+    // DB.IConnection
+    // <editor-fold desc="Connection Methods">
+
+    clearConnection(): void
+    {
+        this._connection = null
+    }
+
+    abstract connect(): boolean
+
+    abstract disconnect(): boolean
+
+    getConnection()
+    {
+        return this
+    }
+
+    abstract isConnected(): boolean
+
+    abstract restartConnection(): void
+
+    // </editor-fold>
+
+    // <editor-fold desc="Queries Methods">
+
+    abstract parseResultQuery(result: any): Record<string, unknown> | []
+
+    abstract table(tableName: string): IQueryBuilder
+
+    abstract get(): Promise<[] | Record<string, unknown>>
+
+    abstract select(...args: string[]): IQueryBuilder
+
+    abstract distinct(status: boolean): IQueryBuilder
+
+    abstract where(...args: Record<string, unknown>[]): IQueryBuilder
+
+    abstract orderBy(...args: string[]): IQueryBuilder
+
+    abstract insert(items: Record<string, any>, options?: Record<string, any>): any
+
+    abstract update(items: Record<string, any>, options?: Record<string, any>): boolean
+
+    abstract delete(): boolean;
+
+    // </editor-fold>
+
+    // <editor-fold desc="Executor Methods">
+
+    abstract getQuery(): string
+
+    abstract raw(query: string): any
+
+    // </editor-fold>
+
+    // <editor-fold desc="Debugging Methods">
+
+    logger(): void
+    {
+        //
+    }
+
+    // </editor-fold>
+
 }

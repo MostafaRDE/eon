@@ -1,0 +1,25 @@
+{
+    "compilerOptions": {
+        "target": "es5",
+        "module": "commonjs",
+        "declaration": true,
+        "outDir": "./dist",
+        "strict": true,
+        "allowSyntheticDefaultImports": true,
+        "allowJs": false,
+        "checkJs": false,
+        "sourceMap": true,
+        "typeRoots": [
+            "./node_modules/@types",
+            "./lib/typings"
+        ]
+    },
+    "include": [
+        "lib",
+        "test"
+    ],
+    "exclude": [
+        "node_modules",
+        ".vscode"
+    ]
+}

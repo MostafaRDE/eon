@@ -1,14 +1,14 @@
-export namespace DB
+export default interface IConnection
 {
-    export interface IConnection
-    {
-        clearConnection(): void
-        connect(): boolean
-        disconnect(): boolean
-        getConnection()
-        getOptions(): object
-        isConnected(): boolean
-        restartConnection(): void
-        setOptions(options: object): void
-    }
+    clearConnection(): void
+
+    connect(): boolean
+
+    disconnect(): boolean
+
+    getConnection(): this
+
+    isConnected(): boolean
+
+    restartConnection(): void
 }

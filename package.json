@@ -1,30 +1,39 @@
 {
-  "name": "eloquent-orm-node",
-  "version": "0.1.1",
-  "description": "Eloquent ORM for Node JS",
-  "main": "index.js",
-  "scripts": {
-    "build": "tsc"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/MostafaRDE/eloquent-orm-node.git"
-  },
-  "author": {
-    "name": "Mostafa Rostam Dokht Effati",
-    "email": "mostafa3.rostamdokht@gmail.com"
-  },
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/MostafaRDE/eloquent-orm-node/issues"
-  },
-  "homepage": "https://github.com/MostafaRDE/eloquent-orm-node#readme",
-  "devDependencies": {
-    "typescript": "^3.9.5"
-  },
-  "dependencies": {
-    "@types/node": "^14.0.13",
-    "pg": "^8.2.1",
-    "pluralize": "^8.0.0"
-  }
+    "name": "eloquent-orm-node",
+    "version": "0.1.1",
+    "description": "Eloquent ORM for Node JS",
+    "main": "index.js",
+    "scripts": {
+        "build": "tsc && node dist/test/DB/Insert.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/MostafaRDE/eloquent-orm-node.git"
+    },
+    "author": {
+        "name": "Mostafa Rostam Dokht Effati",
+        "email": "mostafa3.rostamdokht@gmail.com"
+    },
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/MostafaRDE/eloquent-orm-node/issues"
+    },
+    "homepage": "https://github.com/MostafaRDE/eloquent-orm-node#readme",
+    "devDependencies": {
+        "@typescript-eslint/eslint-plugin": "^3.10.1",
+        "@typescript-eslint/parser": "^3.10.1",
+        "eslint": "^7.8.0",
+        "eslint-config-standard": "^14.1.1",
+        "eslint-plugin-import": "^2.22.0",
+        "eslint-plugin-node": "^11.1.0",
+        "eslint-plugin-promise": "^4.2.1",
+        "eslint-plugin-standard": "^4.0.1",
+        "typescript": "^4.0.2"
+    },
+    "dependencies": {
+        "@types/node": "^14.0.13",
+        "pg": "^8.2.1",
+        "pg-format": "^1.0.4",
+        "pluralize": "^8.0.0"
+    }
 }
