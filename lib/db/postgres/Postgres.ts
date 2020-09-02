@@ -1,10 +1,8 @@
-import Connection from '../Connection'
-import { IOptions } from '../Connection'
+const format = require('pg-format')
+import Connection, { IOptions } from '../Connection'
 import IQueryBuilder from '../IQueryBuilder'
 import { disconnect, getConnection } from './Connection'
-const format = require('pg-format')
-
-const { Pool } = require('pg')
+import QueryType from '../../modules/enums/QueryTypes'
 
 interface IWhere
 {
@@ -16,9 +14,14 @@ interface IWhere
 
 interface IQuery
 {
+    returning: string[]
+    where: IWhere[]
+}
+
+interface IQuerySelect
+{
     distinct: boolean
     select: string[]
-    where: IWhere[]
     orderBy: string[]
 }
 
@@ -26,10 +29,9 @@ interface IQueryInsert
 {
     columns: string[]
     values: any[]
-    returning: string[]
 }
 
-interface IInsert
+interface IInsertOptions
 {
     multiple: boolean
 }
@@ -44,21 +46,23 @@ export default class Postgres extends Connection
     _isConnected = false
 
     query: IQuery = {
+        where: [],
+        returning: [],
+    }
+
+    querySelect: IQuerySelect = {
         distinct: false,
         select: [],
-        where: [],
         orderBy: [],
     }
 
     queryInsert: IQueryInsert = {
         columns: [],
         values: [],
-        returning: [ 'id' ],
     }
 
     queryUpdate = {
-        set: [],
-        where: [],
+        set: {},
     }
 
     queryDelete = {
@@ -145,19 +149,19 @@ export default class Postgres extends Connection
 
     get(): Promise<[] | Record<string, any>>
     {
-        return this.raw(this.getQuery())
+        return this.raw(this.getQuery(QueryType.SELECT))
             .then((res: IResult) => this.parseResultQuery(res))
     }
 
     select(...args: string[]): IQueryBuilder
     {
-        args.forEach(item => this.query.select.push(item))
+        args.forEach(item => this.querySelect.select.push(item))
         return this
     }
 
     distinct(status: boolean): IQueryBuilder
     {
-        this.query.distinct = status
+        this.querySelect.distinct = status
         return this
     }
 
@@ -167,13 +171,19 @@ export default class Postgres extends Connection
         return this
     }
 
-    orderBy(...args: string[]): IQueryBuilder
+    returning(...args: string[]): IQueryBuilder
     {
-        args.forEach(item => this.query.select.push(item))
+        args.forEach(item => this.query.returning.push(item))
         return this
     }
 
-    insert(items: Record<string, any>, options?: IInsert): any
+    orderBy(...args: string[]): IQueryBuilder
+    {
+        args.forEach(item => this.querySelect.select.push(item))
+        return this
+    }
+
+    insert(items: Record<string, any>, options?: IInsertOptions): any
     {
         if (options?.multiple)
         {
@@ -186,6 +196,9 @@ export default class Postgres extends Connection
                 else
                     this.queryInsert.values.push(this.queryInsert.columns.map(column => item[ column ]))
             })
+
+            if (Array.isArray(items.returning))
+                this.query.returning = items.returning
         }
         else
         {
@@ -193,26 +206,22 @@ export default class Postgres extends Connection
             this.queryInsert.values.push(Object.values(items))
         }
 
-        const query = format(
-            'INSERT INTO %I (%s) VALUES %L returning %s',
-            this._table,
-            this.queryInsert.columns.join(', '),
-            this.queryInsert.values,
-            this.queryInsert.returning.join(', '),
-        )
-
-        console.log(query)
-        return this.raw(query)
+        return this.raw(this.getQuery(QueryType.INSERT))
             .then((res: IResult) => this.parseResultQuery(res))
     }
 
-    update(items: [], options: Record<string, any>): boolean
+    update(items: Record<string, any>): Promise<any>
     {
-        return false
+        this.queryUpdate.set = items
+
+        // @ts-ignore
+        return this.raw(this.getQuery(QueryType.UPDATE))
+            .then((res: IResult) => this.parseResultQuery(res))
     }
 
-    delete(): boolean
+    delete(): Promise<any>
     {
+        // @ts-ignore
         return false
     }
 
@@ -220,20 +229,63 @@ export default class Postgres extends Connection
 
     // <editor-fold desc="Executor Methods">
 
-    getQuery(): string
+    getQuery(type: QueryType = QueryType.SELECT): string
     {
-
-        let query = format(
-            'SELECT %s%s FROM %I',
-            this.query.distinct ? 'DISTINCT ' : '',
-            this.query.select.join(', '),
-            this._table,
-        )
-
-        if (this.query.where.length)
+        function getWhere(where: IWhere[])
         {
-            const where = this.query.where.map((item: IWhere, index) => `${ item.key } ${ item.operator || '=' } ${ item.value }${ index + 1 < this.query.where.length ? (` ${ item.condition }` || ' AND') : '' }`).join(' ')
-            query += ` WHERE ${ where } `
+            if (where.length)
+            {
+                const whereResult = where.map((item: IWhere, index) => `${ item.key } ${ item.operator || '=' } ${ format('%L', item.value) }${ index + 1 < where.length ? (` ${ item.condition }` || ' AND') : '' }`).join(' ')
+                return `WHERE ${ whereResult }`
+            }
+            return ''
+        }
+
+        let query = ''
+
+        switch (type)
+        {
+            case QueryType.SELECT:
+
+                query = format(
+                    'SELECT %s%s FROM %I %s',
+                    this.querySelect.distinct ? 'DISTINCT ' : '',
+                    this.querySelect.select.length ? this.querySelect.select.join(', ') : '*',
+                    this._table,
+                    getWhere(this.query.where),
+                )
+
+                break
+
+            case QueryType.INSERT:
+
+                query = format(
+                    'INSERT INTO %I (%s) VALUES %L returning %s',
+                    this._table,
+                    this.queryInsert.columns.join(', '),
+                    this.queryInsert.values,
+                    this.query.returning.length ? this.query.returning.join(', ') : 'id',
+                )
+
+                break
+
+            case QueryType.UPDATE:
+
+                query = format(
+                    'UPDATE %I SET %s %s RETURNING %s',
+                    this._table,
+                    Object.entries(this.queryUpdate.set).map(item => `${ item[0] } = ${ format('%L', item[1]) }`).join(', '),
+                    getWhere(this.query.where),
+                    this.query.returning.length ? this.query.returning.join(', ') : 'id',
+                )
+
+                break
+
+            case QueryType.DELETE:
+
+                query = ''
+
+                break
         }
 
         console.log(query)

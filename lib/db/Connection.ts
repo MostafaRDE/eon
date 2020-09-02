@@ -81,13 +81,15 @@ export default abstract class Connection implements IConnection, IQueryBuilder
 
     abstract where(...args: Record<string, unknown>[]): IQueryBuilder
 
+    abstract returning(...args: string[]): IQueryBuilder
+
     abstract orderBy(...args: string[]): IQueryBuilder
 
-    abstract insert(items: Record<string, any>, options?: Record<string, any>): any
+    abstract insert(items: Record<string, any>, options?: Record<string, any>): Promise<any>
 
-    abstract update(items: Record<string, any>, options?: Record<string, any>): boolean
+    abstract update(items: Record<string, any>): Promise<any>
 
-    abstract delete(): boolean;
+    abstract delete(): Promise<any>
 
     // </editor-fold>
 

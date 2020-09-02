@@ -9,6 +9,8 @@ export default class DB implements IQueryBuilder
     private options: IOptions
     private readonly connection: Connection
 
+    private readonly cloneDeep = 3
+
     constructor(options: IOptions)
     {
         this.options = options
@@ -39,7 +41,7 @@ export default class DB implements IQueryBuilder
 
     // <editor-fold desc="Queries Methods">
 
-    parseResultQuery(result: any): Record<string, any>|[]
+    parseResultQuery(result: any): Record<string, any> | []
     {
         this.connection.parseResultQuery(result)
         return this
@@ -47,7 +49,7 @@ export default class DB implements IQueryBuilder
 
     table(tableName: string): IQueryBuilder
     {
-        const _this = global.clone(this)
+        const _this = global.clone(this, this.cloneDeep)
         _this.connection.table(tableName)
         return _this
     }
@@ -59,47 +61,55 @@ export default class DB implements IQueryBuilder
 
     select(...args: string[]): IQueryBuilder
     {
-        const _this = global.clone(this)
+        const _this = global.clone(this, this.cloneDeep)
         _this.connection.select(...args)
         return _this
     }
 
     distinct(status = true): IQueryBuilder
     {
-        const _this = global.clone(this)
+        const _this = global.clone(this, this.cloneDeep)
         _this.connection.distinct(status)
         return _this
     }
 
-    where(...args: {key: string, operator?: string, value: string, condition?: string}[]): IQueryBuilder
+    where(...args: { key: string, operator?: string, value: string, condition?: string }[]): IQueryBuilder
     {
-        const _this = global.clone(this)
+        const _this = global.clone(this, this.cloneDeep)
         _this.connection.where(...args)
+        return _this
+    }
+
+    returning(...args: string[]): IQueryBuilder
+    {
+        const _this = global.clone(this, this.cloneDeep)
+        _this.connection.returning(...args)
         return _this
     }
 
     orderBy(...args: string[]): IQueryBuilder
     {
-        const _this = global.clone(this)
+        const _this = global.clone(this, this.cloneDeep)
         _this.connection.orderBy(...args)
         return _this
     }
 
-    insert(items: Record<string, any>, options?: Record<string, any>): any
+    insert(items: Record<string, any>, options?: Record<string, any>): Promise<any>
     {
-        const _this = global.clone(this)
+        const _this = global.clone(this, this.cloneDeep)
         return _this.connection.insert(items, options)
     }
 
-    update(items: Record<string, any>, options?: Record<string, any>): boolean
+    update(items: Record<string, any>): Promise<any>
     {
-        const _this = global.clone(this)
-        return _this.connection.update(items, options)
+        const _this = global.clone(this, this.cloneDeep)
+        return _this.connection.update(items)
     }
 
-    delete(): boolean
+    delete(): Promise<any>
     {
-        return false
+        const _this = global.clone(this, this.cloneDeep)
+        return _this.connection.delete()
     }
 
     // </editor-fold>

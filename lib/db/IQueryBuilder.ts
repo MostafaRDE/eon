@@ -20,17 +20,19 @@ export default interface IQueryBuilder
 
     where(...args: Record<string, any>[]): IQueryBuilder
 
+    returning(...args: string[]): IQueryBuilder
+
 
     // Sorting
     orderBy(...args: string[]): IQueryBuilder
 
 
     // Mutations
-    insert(items: (Record<string, any> | Record<string, any>[]), options?: Record<string, any>): any
+    insert(items: (Record<string, any> | Record<string, any>[]), options?: Record<string, any>): Promise<any>
 
-    update(items: [], options: Record<string, any>): boolean
+    update(items: Record<string, any>): Promise<any>
 
-    delete(): boolean
+    delete(): Promise<any>
 
 
     // Debugging
