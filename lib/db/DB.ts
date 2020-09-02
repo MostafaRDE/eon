@@ -17,6 +17,7 @@ export default class DB implements IQueryBuilder
         {
             case Drivers.postgres:
                 this.connection = new Postgres(options)
+                this.connection.connect()
                 break
         }
     }

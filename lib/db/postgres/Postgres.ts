@@ -69,21 +69,21 @@ export default class Postgres extends Connection
     constructor(options: IOptions)
     {
         super(options)
-        this.restartConnection()
-        this.connect()
     }
 
     // <editor-fold desc="Connection Methods">
 
     clearConnection()
     {
-        if (this._connection)
-            this._connection.end()
+        // if (this._connection)
+        //     this.disconnect()
         super.clearConnection()
     }
 
     connect(): boolean
     {
+        this.restartConnection()
+
         try
         {
             this._connection.connect((err: any, client: any, release: () => void) =>
@@ -222,14 +222,22 @@ export default class Postgres extends Connection
 
     getQuery(): string
     {
-        let query = ''
-        const select = `${ this.query.distinct ? 'DISTINCT' : '' }${ this.query.select.join(', ') }`
-        query += `SELECT ${ select } FROM ${ this._table }`
+
+        let query = format(
+            'SELECT %s%s FROM %I',
+            this.query.distinct ? 'DISTINCT ' : '',
+            this.query.select.join(', '),
+            this._table,
+        )
+
         if (this.query.where.length)
         {
             const where = this.query.where.map((item: IWhere, index) => `${ item.key } ${ item.operator || '=' } ${ item.value }${ index + 1 < this.query.where.length ? (` ${ item.condition }` || ' AND') : '' }`).join(' ')
-            query += ` ${ where } `
+            query += ` WHERE ${ where } `
         }
+
+        console.log(query)
+
         return query
     }
 

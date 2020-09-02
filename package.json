@@ -4,7 +4,7 @@
     "description": "Eloquent ORM for Node JS",
     "main": "index.js",
     "scripts": {
-        "build": "tsc && node dist/test/DB/Insert.js"
+        "build": "tsc && node dist/test/DB/Select.js"
     },
     "repository": {
         "type": "git",
