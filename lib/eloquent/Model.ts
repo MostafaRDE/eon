@@ -51,7 +51,7 @@ export default abstract class Model implements IModel
     |
     */
 
-    static connection: DB
+    public connection: DB
 
     /*
     |--------------------------------------------------------------------------
@@ -62,7 +62,7 @@ export default abstract class Model implements IModel
     |
     */
 
-    static create()
+    public create()
     {
         //
     }
@@ -78,7 +78,7 @@ export default abstract class Model implements IModel
     |
     */
 
-    static insert()
+    public insert()
     {
         //
     }
@@ -94,7 +94,7 @@ export default abstract class Model implements IModel
     |
     */
 
-    static update()
+    public update()
     {
         //
     }
@@ -111,7 +111,7 @@ export default abstract class Model implements IModel
     |
     */
 
-    static destroy()
+    public destroy()
     {
         //
     }
@@ -125,7 +125,7 @@ export default abstract class Model implements IModel
     |
     */
 
-    static trashed()
+    public trashed()
     {
         //
     }
@@ -139,7 +139,7 @@ export default abstract class Model implements IModel
     |
     */
 
-    static withTrashed()
+    public withTrashed()
     {
         //
     }
@@ -148,7 +148,7 @@ export default abstract class Model implements IModel
 
     protected tableType: ModelTypes = ModelTypes.table
 
-    protected table: string = ''
+    protected table = ''
 
     protected columns: Record<string, any>
 
@@ -174,8 +174,11 @@ export default abstract class Model implements IModel
 
     protected constructor(data: Record<string, any>)
     {
+        this.connection = new DB()
+
         this.columns = Object.keys(this.data)
         this.data = data
     }
+
 
 }
