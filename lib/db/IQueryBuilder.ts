@@ -1,3 +1,17 @@
+export interface IWhere
+{
+    key: string
+    value: any
+    operator?: string
+    condition?: string
+}
+
+export interface IWhereConfig
+{
+    operator?: string
+    condition?: string
+}
+
 export default interface IQueryBuilder
 {
     getQuery(): string
@@ -18,7 +32,11 @@ export default interface IQueryBuilder
 
     distinct(status: boolean): IQueryBuilder
 
-    where(...args: Record<string, any>[]): IQueryBuilder
+    whereConfig(config: IWhereConfig): IQueryBuilder
+
+    where(...args: IWhere[]): IQueryBuilder
+
+    whereSimple(wheres: Record<string, any>): IQueryBuilder
 
     returning(...args: string[]): IQueryBuilder
 

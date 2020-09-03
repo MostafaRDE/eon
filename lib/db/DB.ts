@@ -2,6 +2,7 @@ import Drivers from '../modules/enums/Drivers'
 import Connection from './Connection'
 import { IOptions } from './Connection'
 import IQueryBuilder from './IQueryBuilder'
+import { IWhere, IWhereConfig } from './IQueryBuilder'
 import Postgres from './postgres/Postgres'
 
 export default class DB implements IQueryBuilder
@@ -73,10 +74,24 @@ export default class DB implements IQueryBuilder
         return _this
     }
 
-    where(...args: { key: string, operator?: string, value: string, condition?: string }[]): IQueryBuilder
+    whereConfig(config: IWhereConfig): IQueryBuilder
+    {
+        const _this = global.clone(this, this.cloneDeep)
+        _this.connection.whereConfig(config)
+        return _this
+    }
+
+    where(...args: IWhere[]): IQueryBuilder
     {
         const _this = global.clone(this, this.cloneDeep)
         _this.connection.where(...args)
+        return _this
+    }
+
+    whereSimple(wheres: Record<string, any>): IQueryBuilder
+    {
+        const _this = global.clone(this, this.cloneDeep)
+        _this.connection.whereSimple(wheres)
         return _this
     }
 

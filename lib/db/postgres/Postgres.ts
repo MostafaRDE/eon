@@ -1,21 +1,15 @@
 const format = require('pg-format')
 import Connection, { IOptions } from '../Connection'
 import IQueryBuilder from '../IQueryBuilder'
+import { IWhere, IWhereConfig } from '../IQueryBuilder'
 import { disconnect, getConnection } from './Connection'
 import QueryType from '../../modules/enums/QueryTypes'
 
-interface IWhere
-{
-    key: string
-    value: string
-    operator?: string
-    condition?: string
-}
-
 interface IQuery
 {
-    returning: string[]
+    whereConfig: IWhereConfig
     where: IWhere[]
+    returning: string[]
 }
 
 interface IQuerySelect
@@ -46,6 +40,10 @@ export default class Postgres extends Connection
     _isConnected = false
 
     query: IQuery = {
+        whereConfig: {
+            condition: 'AND',
+            operator: '=',
+        },
         where: [],
         returning: [],
     }
@@ -165,9 +163,28 @@ export default class Postgres extends Connection
         return this
     }
 
-    where(...args: { key: string, value: string, operator?: string, condition?: string }[]): IQueryBuilder
+    whereConfig(config: IWhereConfig): IQueryBuilder
+    {
+        // @ts-ignore
+        Object.keys(config).forEach(key => this.query.whereConfig[ key ] = config[ key ])
+        return this
+    }
+
+    where(...args: IWhere[]): IQueryBuilder
     {
         args.forEach(item => this.query.where.push(item))
+        return this
+    }
+
+    whereSimple(wheres: Record<string, any>): IQueryBuilder
+    {
+        Object.keys(wheres).forEach(key =>
+        {
+            if (Array.isArray(wheres[ key ]))
+                wheres[ key ].forEach((value: any) => this.query.where.push({ key, value, condition: 'OR' }))
+            else
+                this.query.where.push({ key, value: wheres[ key ] })
+        })
         return this
     }
 
@@ -214,15 +231,14 @@ export default class Postgres extends Connection
     {
         this.queryUpdate.set = items
 
-        // @ts-ignore
         return this.raw(this.getQuery(QueryType.UPDATE))
             .then((res: IResult) => this.parseResultQuery(res))
     }
 
     delete(): Promise<any>
     {
-        // @ts-ignore
-        return false
+        return this.raw(this.getQuery(QueryType.DELETE))
+            .then((res: IResult) => this.parseResultQuery(res))
     }
 
     // </editor-fold>
@@ -231,11 +247,12 @@ export default class Postgres extends Connection
 
     getQuery(type: QueryType = QueryType.SELECT): string
     {
+        const whereConfig = this.query.whereConfig
         function getWhere(where: IWhere[])
         {
             if (where.length)
             {
-                const whereResult = where.map((item: IWhere, index) => `${ item.key } ${ item.operator || '=' } ${ format('%L', item.value) }${ index + 1 < where.length ? (` ${ item.condition }` || ' AND') : '' }`).join(' ')
+                const whereResult = where.map((item: IWhere, index) => `${ item.key } ${ item.operator || whereConfig.operator } ${ format('%L', item.value) }${ index + 1 < where.length ? ` ${ item.condition || whereConfig.condition }` : '' }`).join(' ')
                 return `WHERE ${ whereResult }`
             }
             return ''
@@ -283,7 +300,12 @@ export default class Postgres extends Connection
 
             case QueryType.DELETE:
 
-                query = ''
+                query = format(
+                    'DELETE FROM %I %s RETURNING %s',
+                    this._table,
+                    getWhere(this.query.where),
+                    this.query.returning.length ? this.query.returning.join(', ') : 'id',
+                )
 
                 break
         }

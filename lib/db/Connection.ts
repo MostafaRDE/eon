@@ -1,5 +1,6 @@
 import IConnection from './IConnection'
 import IQueryBuilder from './IQueryBuilder'
+import { IWhere, IWhereConfig } from './IQueryBuilder'
 import Drivers from '../modules/enums/Drivers'
 
 export interface IOptions
@@ -15,7 +16,7 @@ export interface IOptions
 export default abstract class Connection implements IConnection, IQueryBuilder
 {
     protected _connection: any = null
-    protected _table: string = ''
+    protected _table = ''
     protected query = {}
     protected queryInsert = {}
     protected queryUpdate = {}
@@ -79,7 +80,11 @@ export default abstract class Connection implements IConnection, IQueryBuilder
 
     abstract distinct(status: boolean): IQueryBuilder
 
-    abstract where(...args: Record<string, unknown>[]): IQueryBuilder
+    abstract whereConfig(config: IWhereConfig): IQueryBuilder
+
+    abstract where(...args: IWhere[]): IQueryBuilder
+
+    abstract whereSimple(wheres: Record<string, any>): IQueryBuilder
 
     abstract returning(...args: string[]): IQueryBuilder
 
