@@ -1,7 +1,4 @@
-import eon from '../../lib'
-import config from '../config'
-
-const con = new eon.DB(config.connection1.development)
+import con from '../Connection'
 
 con.table('table_name').where({
     key: 'id',

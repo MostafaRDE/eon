@@ -1,9 +1,8 @@
-import Drivers from '../lib/modules/enums/Drivers'
-
-export default {
+module.exports = {
+    default: 'connection1.development',
     connection1: {
         development: {
-            driver: Drivers.postgres,
+            driver: 'postgres',
             host: '127.0.0.1',
             port: 5432,
             username: 'postgres',
@@ -11,7 +10,7 @@ export default {
             database: 'postgres',
         },
         test: {
-            driver: Drivers.postgres,
+            driver: 'postgres',
             host: '127.0.0.1',
             port: 5432,
             username: 'postgres',
@@ -19,12 +18,12 @@ export default {
             database: '',
         },
         production: {
-            driver: Drivers.postgres,
+            driver: 'postgres',
             host: '127.0.0.1',
             port: 5432,
             username: 'postgres',
             password: 'root',
             database: '',
         },
-    }
+    },
 }

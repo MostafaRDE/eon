@@ -32,6 +32,7 @@
     },
     "dependencies": {
         "@types/node": "^14.0.13",
+        "find-up": "^5.0.0",
         "pg": "^8.2.1",
         "pg-format": "^1.0.4",
         "pluralize": "^8.0.0"

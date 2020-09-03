@@ -5,7 +5,7 @@ import Drivers from '../modules/enums/Drivers'
 
 export interface IOptions
 {
-    driver: Drivers
+    driver: (Drivers | string)
     host: string
     port?: string | number
     username?: string

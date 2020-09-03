@@ -1,3 +1,5 @@
+const fs = require('fs')
+const findUp = require('find-up')
 import Drivers from '../modules/enums/Drivers'
 import Connection from './Connection'
 import { IOptions } from './Connection'
@@ -8,17 +10,44 @@ import Postgres from './postgres/Postgres'
 export default class DB implements IQueryBuilder
 {
     private options: IOptions
+    // @ts-ignore
     private readonly connection: Connection
 
     private readonly cloneDeep = 3
 
-    constructor(options: IOptions)
+    constructor(options?: IOptions)
     {
+        if (!options)
+        {
+            let config = {}, configPath = findUp.sync([ '.eonrc.json' ])
+            if (configPath)
+            {
+                // @ts-ignore
+                config = JSON.parse(fs.readFileSync(configPath))
+            }
+            else
+            {
+                configPath = findUp.sync([ '.eonrc.js' ])
+                if (configPath)
+                    config = require(configPath)
+            }
+
+            // @ts-ignore
+            options = config
+            // @ts-ignore
+            config.default.split('.').forEach(item => { options = options[ item ] })
+
+            // @ts-ignore
+            this.options = config
+        }
+        // @ts-ignore
         this.options = options
 
-        switch (options.driver)
+        // @ts-ignore
+        switch (Drivers[ options?.driver ])
         {
             case Drivers.postgres:
+                // @ts-ignore
                 this.connection = new Postgres(options)
                 this.connection.connect()
                 break
