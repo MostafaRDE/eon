@@ -252,7 +252,7 @@ export default class Postgres extends Connection
         {
             if (where.length)
             {
-                const whereResult = where.map((item: IWhere, index) => `${ item.key } ${ item.operator || whereConfig.operator } ${ format('%L', item.value) }${ index + 1 < where.length ? ` ${ item.condition || whereConfig.condition }` : '' }`).join(' ')
+                const whereResult = where.map((item: IWhere, index) => `${ item.key } ${ item.operator || whereConfig.operator } ${ item.isStringFormat === undefined || item.isStringFormat ? format('%L', item.value) : item.value }${ index + 1 < where.length ? ` ${ item.condition || whereConfig.condition }` : '' }`).join(' ')
                 return `WHERE ${ whereResult }`
             }
             return ''

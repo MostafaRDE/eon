@@ -1,5 +1,14 @@
 import ModelTypes from '../modules/enums/ModelTypes'
 import DB from '../db/DB'
+import GettersSetters from '../modules/GettersSetters'
+import IQueryBuilder from '../db/IQueryBuilder'
+
+enum TrashStatus
+{
+    ALL,
+    NOT_DELETED,
+    DELETED,
+}
 
 interface IModel
 {
@@ -40,7 +49,7 @@ interface IModel
     // logger(): any
 }
 
-export default abstract class Model implements IModel
+export default class Model extends GettersSetters implements IModel
 {
     /*
     |--------------------------------------------------------------------------
@@ -51,7 +60,34 @@ export default abstract class Model implements IModel
     |
     */
 
-    public connection: DB
+    public connection: IQueryBuilder
+
+    private static baseConfigConnection(model: Model): Model
+    {
+        model.connection = model.connection.table(model.table)
+
+        if (model.softDelete)
+            switch (model.trashStatus)
+            {
+                case TrashStatus.DELETED:
+                    model.connection = model.connection.where({
+                        key: model.softDeleteKey,
+                        value: 'is not null',
+                        isStringFormat: false,
+                    })
+                    break
+
+                case TrashStatus.NOT_DELETED:
+                    model.connection = model.connection.where({
+                        key: model.softDeleteKey,
+                        value: 'is null',
+                        isStringFormat: false,
+                    })
+                    break
+            }
+
+        return model
+    }
 
     /*
     |--------------------------------------------------------------------------
@@ -62,9 +98,11 @@ export default abstract class Model implements IModel
     |
     */
 
-    public create()
+    public static create()
     {
-        //
+        const temp = new this()
+        temp.connection.table(temp.table)
+        return temp
     }
 
     /*
@@ -78,9 +116,10 @@ export default abstract class Model implements IModel
     |
     */
 
-    public insert()
+    public static insert(items: (Record<string, any> | Record<string, any>[]), options?: Record<string, any>)
     {
-        //
+        const temp = new this()
+        return Model.baseConfigConnection(temp).connection.insert(items, options)
     }
 
     /*
@@ -94,9 +133,10 @@ export default abstract class Model implements IModel
     |
     */
 
-    public update()
+    public static update (items: Record<string, any>): Promise<any>
     {
-        //
+        const temp = new this()
+        return Model.baseConfigConnection(temp).connection.update(items)
     }
 
     /*
@@ -111,9 +151,10 @@ export default abstract class Model implements IModel
     |
     */
 
-    public destroy()
+    public static delete(): Promise<any>
     {
-        //
+        const temp = new this()
+        return Model.baseConfigConnection(temp).connection.delete()
     }
 
     /*
@@ -125,9 +166,33 @@ export default abstract class Model implements IModel
     |
     */
 
-    public trashed()
+    public static trashed()
     {
-        //
+        const temp = new this()
+        return temp.connection.table(temp.table).where({
+            key: temp.softDeleteKey,
+            value: 'is not null',
+            isStringFormat: false,
+        })
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Model not in trash method
+    |--------------------------------------------------------------------------
+    |
+    | This option for retrieve soft deleted rows from database.
+    |
+    */
+
+    public static notInTrash()
+    {
+        const temp = new this()
+        return temp.connection.table(temp.table).where({
+            key: temp.softDeleteKey,
+            value: 'is null',
+            isStringFormat: false,
+        })
     }
 
     /*
@@ -139,18 +204,32 @@ export default abstract class Model implements IModel
     |
     */
 
-    public withTrashed()
+    public static withTrashed()
     {
-        //
+        const temp = new this()
+        return temp.connection.table(temp.table)
     }
 
     ///////////////////////////////////////////
 
     protected tableType: ModelTypes = ModelTypes.table
 
-    protected table = ''
+    protected _table = ''
 
-    protected columns: Record<string, any>
+    protected get table()
+    {
+        if (this._table !== '')
+            return this._table
+        else
+            return global.changeStringCase(this.constructor.name, 'snake')
+    }
+
+    protected set table(table)
+    {
+        this._table = table
+    }
+
+    protected columns: Record<string, any> = {}
 
     protected data: Record<string, any> = {}
 
@@ -164,6 +243,10 @@ export default abstract class Model implements IModel
 
     protected timestamps = true
 
+    protected softDelete = false
+
+    protected softDeleteKey = 'deleted_at'
+
     protected fillable: Array<string> = []
 
     protected guarded: Array<string> = []
@@ -172,13 +255,13 @@ export default abstract class Model implements IModel
 
     protected incrementing = true
 
-    protected constructor(data: Record<string, any>)
+    private trashStatus = TrashStatus.NOT_DELETED
+
+    protected constructor()
     {
+        super()
+
+        // console.log('new', new.target.name)
         this.connection = new DB()
-
-        this.columns = Object.keys(this.data)
-        this.data = data
     }
-
-
 }

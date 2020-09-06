@@ -11,7 +11,8 @@
         "sourceMap": true,
         "typeRoots": [
             "./node_modules/@types",
-            "./lib/typings"
+            "./lib/typings",
+            "./test/typings"
         ]
     },
     "include": [

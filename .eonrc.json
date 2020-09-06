@@ -6,8 +6,10 @@
             "host": "127.0.0.1",
             "port": 5432,
             "username": "postgres",
-            "password": "12345",
-            "database": "postgres"
+            "password": "123",
+            "database": "postgres",
+            "model_path": "./test/Models"
+
         },
         "test": {
             "driver": "postgres",

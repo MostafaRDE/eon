@@ -85,7 +85,39 @@ export function clone<T>(instance: T, deep = 1): (T | any[])
     }
 }
 
-export function hasOwnProperty(object: Record<string, unknown>, key: string)
+export function hasOwnProperty(object: Record<string, unknown>, key: string): boolean
 {
     return Object.prototype.hasOwnProperty.call(object, key)
+}
+
+export function changeStringCase(text: string, type: string): string
+{
+    switch (type)
+    {
+        case 'camel':
+            return text.toLowerCase().replace(/[^a-zA-Z0-9]+(.)/g, (m, chr) => chr.toUpperCase())
+
+        case 'kebab':
+        case 'snake':
+        {
+            const temp = text.match(/[A-Z]{2,}(?=[A-Z][a-z]+[0-9]*|\b)|[A-Z]?[a-z]+[0-9]*|[A-Z]|[0-9]+/g)
+            if (temp)
+            {
+                if (type === 'kebab')
+                    return temp.map(x => x.toLowerCase()).join('-')
+                else
+                    return temp.map(x => x.toLowerCase()).join('_')
+            }
+            else
+            {
+                return ''
+            }
+        }
+
+        case 'pascal':
+            return text.replace(/\w\S*/g, m => m.charAt(0).toUpperCase() + m.substr(1).toLowerCase())
+
+        default:
+            return ''
+    }
 }

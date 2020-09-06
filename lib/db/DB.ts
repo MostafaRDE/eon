@@ -9,6 +9,48 @@ import Postgres from './postgres/Postgres'
 
 export default class DB implements IQueryBuilder
 {
+
+    public static getConnection(path: string): DB
+    {
+        // @ts-ignore
+        return new DB(DB.getOptions(path))
+    }
+
+    private static getOptions(path?: string)
+    {
+        let options = {}, config = {}, configPath = findUp.sync([ '.eonrc.json' ])
+
+        if (configPath)
+        {
+            // @ts-ignore
+            config = JSON.parse(fs.readFileSync(configPath))
+        }
+        else
+        {
+            configPath = findUp.sync([ '.eonrc.js' ])
+            if (configPath)
+                config = require(configPath)
+        }
+
+        // @ts-ignore
+        options = config
+
+        if (path)
+        {
+            // @ts-ignore
+            path.split('.').forEach(item => { options = options[ item ] })
+        }
+        else
+        {
+            // @ts-ignore
+            config.default.split('.').forEach(item => { options = options[ item ] })
+        }
+
+        return options
+    }
+
+    ///////////////////////////////////////////
+
     private options: IOptions
     // @ts-ignore
     private readonly connection: Connection
@@ -18,37 +60,18 @@ export default class DB implements IQueryBuilder
     constructor(options?: IOptions)
     {
         if (!options)
-        {
-            let config = {}, configPath = findUp.sync([ '.eonrc.json' ])
-            if (configPath)
-            {
-                // @ts-ignore
-                config = JSON.parse(fs.readFileSync(configPath))
-            }
-            else
-            {
-                configPath = findUp.sync([ '.eonrc.js' ])
-                if (configPath)
-                    config = require(configPath)
-            }
-
             // @ts-ignore
-            options = config
+            this.options = DB.getOptions()
+        else
             // @ts-ignore
-            config.default.split('.').forEach(item => { options = options[ item ] })
-
-            // @ts-ignore
-            this.options = config
-        }
-        // @ts-ignore
-        this.options = options
+            this.options = options
 
         // @ts-ignore
-        switch (Drivers[ options?.driver ])
+        switch (Drivers[ this.options?.driver ])
         {
             case Drivers.postgres:
                 // @ts-ignore
-                this.connection = new Postgres(options)
+                this.connection = new Postgres(this.options)
                 this.connection.connect()
                 break
         }

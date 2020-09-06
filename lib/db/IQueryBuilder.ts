@@ -4,6 +4,7 @@ export interface IWhere
     value: any
     operator?: string
     condition?: string
+    isStringFormat?: boolean
 }
 
 export interface IWhereConfig
