@@ -2,6 +2,7 @@ import ModelTypes from '../modules/enums/ModelTypes'
 import DB from '../db/DB'
 import GettersSetters from '../modules/GettersSetters'
 import IQueryBuilder from '../db/IQueryBuilder'
+const pluralize = require('pluralize')
 
 enum TrashStatus
 {
@@ -62,6 +63,15 @@ export default class Model extends GettersSetters implements IModel
 
     public connection: IQueryBuilder
 
+    /*
+    |--------------------------------------------------------------------------
+    | Config Basic internal connection
+    |--------------------------------------------------------------------------
+    |
+    | This option for config internal connection at first creation action.
+    |
+    */
+
     private static baseConfigConnection(model: Model): Model
     {
         model.connection = model.connection.table(model.table)
@@ -91,6 +101,58 @@ export default class Model extends GettersSetters implements IModel
 
     /*
     |--------------------------------------------------------------------------
+    | Filter for Insert or Update Action
+    |--------------------------------------------------------------------------
+    |
+    | With this option, we can check and validate data for insert or update
+    | in the model.
+    |
+    */
+
+    private static insertOrUpdateFilter(model: Model, item: Record<string, any>): Record<string, any> | undefined
+    {
+        const keys = Object.keys(item).filter(key => model.fillable.includes(key))
+        if (keys.length)
+        {
+            let allowToInsert = true
+            for (let i = 0; i < model.required.length; i++)
+            {
+                if (!model.required.includes(keys[ i ]))
+                {
+                    allowToInsert = false
+                    break
+                }
+            }
+
+            if (allowToInsert)
+            {
+                const temp: Record<string, any> = {}
+                keys.forEach(key => temp[ key ] = item[ key ])
+                return temp
+            }
+        }
+
+        return
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Model select method
+    |--------------------------------------------------------------------------
+    |
+    | This option for select a model locally as simple way with your data.
+    |
+    */
+
+    public static select(...args: string[])
+    {
+        const model = new this()
+        model.connection = model.connection.table(model.table).select(...args)
+        return model
+    }
+
+    /*
+    |--------------------------------------------------------------------------
     | Model create method
     |--------------------------------------------------------------------------
     |
@@ -98,16 +160,21 @@ export default class Model extends GettersSetters implements IModel
     |
     */
 
-    public static create()
+    public static create(item: Record<string, any>)
     {
-        const temp = new this()
-        temp.connection.table(temp.table)
-        return temp
+        const model = new this()
+        model.connection = model.connection.table(model.table)
+
+        const temp = Model.insertOrUpdateFilter(model, item)
+        if (temp)
+            model.columns = temp
+
+        return model
     }
 
     /*
     |--------------------------------------------------------------------------
-    | Model insert method
+    | Model Insert Method
     |--------------------------------------------------------------------------
     |
     | This option for create a model physically as simple way with your data.
@@ -118,8 +185,29 @@ export default class Model extends GettersSetters implements IModel
 
     public static insert(items: (Record<string, any> | Record<string, any>[]), options?: Record<string, any>)
     {
-        const temp = new this()
-        return Model.baseConfigConnection(temp).connection.insert(items, options)
+        const model = new this()
+
+        let tempItems: (Record<string, any> | Record<string, any>[])
+        if (Array.isArray(items))
+        {
+            tempItems = []
+
+            items.forEach(item =>
+            {
+                const temp = Model.insertOrUpdateFilter(model, item)
+                if (temp)
+                    tempItems.push(temp)
+            })
+        }
+        else
+        {
+            tempItems = {}
+            const temp = Model.insertOrUpdateFilter(model, items)
+            if (temp)
+                tempItems = temp
+        }
+
+        return Model.baseConfigConnection(model).connection.insert(tempItems, options)
     }
 
     /*
@@ -135,8 +223,14 @@ export default class Model extends GettersSetters implements IModel
 
     public static update (items: Record<string, any>): Promise<any>
     {
-        const temp = new this()
-        return Model.baseConfigConnection(temp).connection.update(items)
+        const model = new this()
+
+        let tempItems = {}
+        const temp = Model.insertOrUpdateFilter(model, items)
+        if (temp)
+            tempItems = temp
+
+        return Model.baseConfigConnection(model).connection.update(tempItems)
     }
 
     /*
@@ -153,8 +247,8 @@ export default class Model extends GettersSetters implements IModel
 
     public static delete(): Promise<any>
     {
-        const temp = new this()
-        return Model.baseConfigConnection(temp).connection.delete()
+        const model = new this()
+        return Model.baseConfigConnection(model).connection.delete()
     }
 
     /*
@@ -168,9 +262,9 @@ export default class Model extends GettersSetters implements IModel
 
     public static trashed()
     {
-        const temp = new this()
-        return temp.connection.table(temp.table).where({
-            key: temp.softDeleteKey,
+        const model = new this()
+        return model.connection.table(model.table).where({
+            key: model.softDeleteKey,
             value: 'is not null',
             isStringFormat: false,
         })
@@ -187,9 +281,9 @@ export default class Model extends GettersSetters implements IModel
 
     public static notInTrash()
     {
-        const temp = new this()
-        return temp.connection.table(temp.table).where({
-            key: temp.softDeleteKey,
+        const model = new this()
+        return model.connection.table(model.table).where({
+            key: model.softDeleteKey,
             value: 'is null',
             isStringFormat: false,
         })
@@ -206,8 +300,8 @@ export default class Model extends GettersSetters implements IModel
 
     public static withTrashed()
     {
-        const temp = new this()
-        return temp.connection.table(temp.table)
+        const model = new this()
+        return model.connection.table(model.table)
     }
 
     ///////////////////////////////////////////
@@ -221,7 +315,7 @@ export default class Model extends GettersSetters implements IModel
         if (this._table !== '')
             return this._table
         else
-            return global.changeStringCase(this.constructor.name, 'snake')
+            return pluralize(global.changeStringCase(this.constructor.name, 'snake'))
     }
 
     protected set table(table)
@@ -249,6 +343,8 @@ export default class Model extends GettersSetters implements IModel
 
     protected fillable: Array<string> = []
 
+    protected required: Array<string> = []
+
     protected guarded: Array<string> = []
 
     protected hidden: Array<string> = []
@@ -257,9 +353,13 @@ export default class Model extends GettersSetters implements IModel
 
     private trashStatus = TrashStatus.NOT_DELETED
 
-    protected constructor()
+    constructor()
     {
         super()
+
+        Object.defineProperty(this, '_Model', {
+            get: () => Model,
+        })
 
         // console.log('new', new.target.name)
         this.connection = new DB()

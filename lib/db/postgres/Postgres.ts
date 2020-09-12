@@ -310,13 +310,12 @@ export default class Postgres extends Connection
                 break
         }
 
-        console.log(query)
-
         return query
     }
 
     raw(query: string): Promise<any>
     {
+        console.log(query)
         this.restartConnection()
         return new Promise((resolve, reject) =>
         {
