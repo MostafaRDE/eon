@@ -4,7 +4,7 @@
     "description": "Eloquent ORM for Node JS",
     "main": "index.js",
     "scripts": {
-        "build": "tsc && node dist/test/Models/User.js"
+        "build": "tsc && node dist/test/Models/UserTest.js"
     },
     "repository": {
         "type": "git",

@@ -1,7 +1,7 @@
 import ModelTypes from '../modules/enums/ModelTypes'
 import DB from '../db/DB'
-import GettersSetters from '../modules/GettersSetters'
 import IQueryBuilder from '../db/IQueryBuilder'
+
 const pluralize = require('pluralize')
 
 enum TrashStatus
@@ -9,6 +9,12 @@ enum TrashStatus
     ALL,
     NOT_DELETED,
     DELETED,
+}
+
+export interface IModelProperties
+{
+    [ key: string ]: any
+    data: Record<string, any>
 }
 
 interface IModel
@@ -50,7 +56,7 @@ interface IModel
     // logger(): any
 }
 
-export default class Model extends GettersSetters implements IModel
+export default class Model implements IModel, IModelProperties
 {
     /*
     |--------------------------------------------------------------------------
@@ -74,7 +80,7 @@ export default class Model extends GettersSetters implements IModel
 
     private static baseConfigConnection(model: Model): Model
     {
-        model.connection = model.connection.table(model.table)
+        model.connection = model.connection.table(model._table)
 
         if (model.softDelete)
             switch (model.trashStatus)
@@ -147,7 +153,7 @@ export default class Model extends GettersSetters implements IModel
     public static select(...args: string[])
     {
         const model = new this()
-        model.connection = model.connection.table(model.table).select(...args)
+        model.connection = model.connection.table(model._table).select(...args)
         return model
     }
 
@@ -163,7 +169,7 @@ export default class Model extends GettersSetters implements IModel
     public static create(item: Record<string, any>)
     {
         const model = new this()
-        model.connection = model.connection.table(model.table)
+        model.connection = model.connection.table(model._table)
 
         const temp = Model.insertOrUpdateFilter(model, item)
         if (temp)
@@ -221,7 +227,7 @@ export default class Model extends GettersSetters implements IModel
     |
     */
 
-    public static update (items: Record<string, any>): Promise<any>
+    public static update(items: Record<string, any>): Promise<any>
     {
         const model = new this()
 
@@ -263,7 +269,7 @@ export default class Model extends GettersSetters implements IModel
     public static trashed()
     {
         const model = new this()
-        return model.connection.table(model.table).where({
+        return model.connection.table(model._table).where({
             key: model.softDeleteKey,
             value: 'is not null',
             isStringFormat: false,
@@ -282,7 +288,7 @@ export default class Model extends GettersSetters implements IModel
     public static notInTrash()
     {
         const model = new this()
-        return model.connection.table(model.table).where({
+        return model.connection.table(model._table).where({
             key: model.softDeleteKey,
             value: 'is null',
             isStringFormat: false,
@@ -301,35 +307,35 @@ export default class Model extends GettersSetters implements IModel
     public static withTrashed()
     {
         const model = new this()
-        return model.connection.table(model.table)
+        return model.connection.table(model._table)
     }
 
     ///////////////////////////////////////////
 
     protected tableType: ModelTypes = ModelTypes.table
 
-    protected _table = ''
+    protected table = ''
 
-    protected get table()
+    private get _table()
     {
-        if (this._table !== '')
-            return this._table
+        if (this.table !== '')
+            return this.table
         else
             return pluralize(global.changeStringCase(this.constructor.name, 'snake'))
     }
 
-    protected set table(table)
+    private set _table(table)
     {
-        this._table = table
+        this.table = table
     }
 
     protected columns: Record<string, any> = {}
 
-    protected data: Record<string, any> = {}
+    public data: Record<string, any> = {}
 
-    protected primaryKey: string|Array<string> = 'id'
+    protected primaryKey: string | Array<string> = 'id'
 
-    protected keyType: string|Array<string> = 'integer'
+    protected keyType: string | Array<string> = 'integer'
 
     protected dates: Array<string> = [ 'created_at', 'updated_at' ]
 
@@ -355,13 +361,24 @@ export default class Model extends GettersSetters implements IModel
 
     constructor()
     {
-        super()
-
-        Object.defineProperty(this, '_Model', {
-            get: () => Model,
-        })
-
         // console.log('new', new.target.name)
         this.connection = new DB()
+
+        return new Proxy(this, {
+            get: (target: any, property: string | number | symbol) => target[ property ],
+            set: (target: any, property: string | number | symbol, value: any): boolean =>
+            {
+                if (target.hasOwnProperty(property))
+                    target[ property ] = value
+                else
+                    target.data[ property ] = value
+                return true
+            },
+        })
     }
+}
+
+export function exporter<T extends IModelProperties>(model: any): T
+{
+    return new model()
 }
