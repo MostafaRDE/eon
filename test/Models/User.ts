@@ -1,5 +1,5 @@
 import '../../index'
-import Model, { exporter } from '../../lib/eloquent/Model'
+import Model, { instanceCreator } from '../../lib/eloquent/Model'
 
 export interface IModelProperties
 {
@@ -42,4 +42,4 @@ export default class User extends Model
     ]
 }
 
-export const instance = exporter<IModelProperties>(User)
+export const instance = instanceCreator<IModelProperties>(User)

@@ -58,6 +58,8 @@ interface IModel
 
 export default class Model implements IModel, IModelProperties
 {
+    // <editor-fold desc="Static Methods">
+
     /*
     |--------------------------------------------------------------------------
     | Model connection
@@ -310,6 +312,8 @@ export default class Model implements IModel, IModelProperties
         return model.connection.table(model._table)
     }
 
+    // </editor-fold>
+
     ///////////////////////////////////////////
 
     protected tableType: ModelTypes = ModelTypes.table
@@ -378,7 +382,7 @@ export default class Model implements IModel, IModelProperties
     }
 }
 
-export function exporter<T extends IModelProperties>(model: any): T
+export function instanceCreator<T extends IModelProperties>(model: any): T
 {
     return new model()
 }
