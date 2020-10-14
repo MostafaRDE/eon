@@ -265,7 +265,7 @@ export default class Postgres extends Connection
             case QueryType.SELECT:
 
                 query = format(
-                    'SELECT %s%s FROM %I %s',
+                    'SELECT %s%s FROM %s %s',
                     this.querySelect.distinct ? 'DISTINCT ' : '',
                     this.querySelect.select.length ? this.querySelect.select.join(', ') : '*',
                     this._table,
