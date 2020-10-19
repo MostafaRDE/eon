@@ -277,7 +277,7 @@ export default class Postgres extends Connection
             case QueryType.INSERT:
 
                 query = format(
-                    'INSERT INTO %I (%s) VALUES %L returning %s',
+                    'INSERT INTO %s (%s) VALUES %L returning %s',
                     this._table,
                     this.queryInsert.columns.join(', '),
                     this.queryInsert.values,
@@ -289,7 +289,7 @@ export default class Postgres extends Connection
             case QueryType.UPDATE:
 
                 query = format(
-                    'UPDATE %I SET %s %s RETURNING %s',
+                    'UPDATE %s SET %s %s RETURNING %s',
                     this._table,
                     Object.entries(this.queryUpdate.set).map(item => `${ item[0] } = ${ format('%L', item[1]) }`).join(', '),
                     getWhere(this.query.where),
@@ -301,7 +301,7 @@ export default class Postgres extends Connection
             case QueryType.DELETE:
 
                 query = format(
-                    'DELETE FROM %I %s RETURNING %s',
+                    'DELETE FROM %s %s RETURNING %s',
                     this._table,
                     getWhere(this.query.where),
                     this.query.returning.length ? this.query.returning.join(', ') : 'id',
