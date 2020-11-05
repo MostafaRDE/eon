@@ -257,6 +257,12 @@ export default class Postgres extends Connection
             }
             return ''
         }
+        function getOrderBy(orderBy: string[])
+        {
+            if (orderBy.length)
+                return `ORDER BY ${ orderBy.join(', ') }`
+            return ''
+        }
 
         let query = ''
 
@@ -265,11 +271,12 @@ export default class Postgres extends Connection
             case QueryType.SELECT:
 
                 query = format(
-                    'SELECT %s%s FROM %s %s',
+                    'SELECT %s%s FROM %s %s %s',
                     this.querySelect.distinct ? 'DISTINCT ' : '',
                     this.querySelect.select.length ? this.querySelect.select.join(', ') : '*',
                     this._table,
                     getWhere(this.query.where),
+                    getOrderBy(this.querySelect.orderBy),
                 )
 
                 break
