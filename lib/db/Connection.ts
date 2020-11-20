@@ -70,11 +70,13 @@ export default abstract class Connection implements IConnection, IQueryBuilder
 
     // <editor-fold desc="Queries Methods">
 
-    abstract parseResultQuery(result: any): Record<string, unknown> | []
+    abstract parseResultQuery(result: any): any[]
 
     abstract table(tableName: string): IQueryBuilder
 
-    abstract get(): Promise<[] | Record<string, unknown>>
+    abstract get(): Promise<any[]>
+
+    abstract first(): Promise<Record<string, any>>
 
     abstract select(...args: string[]): IQueryBuilder
 

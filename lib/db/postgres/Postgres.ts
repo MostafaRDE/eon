@@ -145,10 +145,21 @@ export default class Postgres extends Connection
         return this
     }
 
-    get(): Promise<[] | Record<string, any>>
+    get(): Promise<any[]>
     {
         return this.raw(this.getQuery(QueryType.SELECT))
             .then((res: IResult) => this.parseResultQuery(res))
+    }
+
+    first(): Promise<Record<string, any>>
+    {
+        return this.raw(this.getQuery(QueryType.SELECT))
+            .then((res: IResult) =>
+            {
+                const items = this.parseResultQuery(res)
+                if (items.length)
+                    return items[ 0 ]
+            })
     }
 
     select(...args: string[]): IQueryBuilder
@@ -196,7 +207,7 @@ export default class Postgres extends Connection
 
     orderBy(...args: string[]): IQueryBuilder
     {
-        args.forEach(item => this.querySelect.select.push(item))
+        args.forEach(item => this.querySelect.orderBy.push(item))
         return this
     }
 
@@ -322,7 +333,6 @@ export default class Postgres extends Connection
 
     raw(query: string): Promise<any>
     {
-        console.log(query)
         this.restartConnection()
         return new Promise((resolve, reject) =>
         {
@@ -342,7 +352,7 @@ export default class Postgres extends Connection
         })
     }
 
-    parseResultQuery(result: IResult): Record<string, any> | []
+    parseResultQuery(result: IResult): any[]
     {
         return result.rows
     }

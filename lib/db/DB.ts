@@ -94,7 +94,7 @@ export default class DB implements IQueryBuilder
 
     // <editor-fold desc="Queries Methods">
 
-    parseResultQuery(result: any): Record<string, any> | []
+    parseResultQuery(result: any): any
     {
         this.connection.parseResultQuery(result)
         return this
@@ -107,9 +107,14 @@ export default class DB implements IQueryBuilder
         return _this
     }
 
-    get(): Promise<[] | Record<string, any>>
+    get(): Promise<any[]>
     {
         return this.connection.get()
+    }
+
+    first(): Promise<Record<string, any>>
+    {
+        return this.connection.first()
     }
 
     select(...args: string[]): IQueryBuilder

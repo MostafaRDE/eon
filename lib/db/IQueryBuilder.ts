@@ -21,13 +21,15 @@ export default interface IQueryBuilder
 
 
     // Collection
-    parseResultQuery(result: any): Record<string, any> | []
+    parseResultQuery(result: any): any[]
 
 
     // Query
     table(tableName: string): IQueryBuilder
 
-    get(): Promise<Record<string, any> | Record<string, any>[]>
+    get(): Promise<Record<string, any>[]>
+
+    first(): Promise<Record<string, any>>
 
     select(...args: string[]): IQueryBuilder
 
@@ -44,6 +46,10 @@ export default interface IQueryBuilder
 
     // Sorting
     orderBy(...args: string[]): IQueryBuilder
+
+
+    // Joins
+    join(source: 'string', condition: Record<string, any>, options?: Record<string, any>): IQueryBuilder
 
 
     // Mutations
