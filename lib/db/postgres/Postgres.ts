@@ -1,7 +1,7 @@
 const format = require('pg-format')
 import Connection, { IOptions } from '../Connection'
 import IQueryBuilder from '../IQueryBuilder'
-import { IWhere, IWhereConfig } from '../IQueryBuilder'
+import { IWhere, IWhereConfig, IJoin } from '../IQueryBuilder'
 import { disconnect, getConnection } from './Connection'
 import QueryType from '../../modules/enums/QueryTypes'
 
@@ -17,6 +17,7 @@ interface IQuerySelect
     distinct: boolean
     select: string[]
     orderBy: string[]
+    joins: IJoin[]
 }
 
 interface IQueryInsert
@@ -52,6 +53,7 @@ export default class Postgres extends Connection
         distinct: false,
         select: [],
         orderBy: [],
+        joins: [],
     }
 
     queryInsert: IQueryInsert = {
@@ -211,6 +213,37 @@ export default class Postgres extends Connection
         return this
     }
 
+    join(keyA: string, operation: string, keyB: string, type = 'INNER'): IQueryBuilder
+    {
+        this.querySelect.joins.push({
+            type,
+            keyA,
+            operation,
+            keyB,
+        })
+        return this
+    }
+
+    innerJoin(keyA: string, operation: string, keyB: string): IQueryBuilder
+    {
+        return this.join(keyA, operation, keyB, 'INNER')
+    }
+
+    leftJoin(keyA: string, operation: string, keyB: string): IQueryBuilder
+    {
+        return this.join(keyA, operation, keyB, 'LEFT')
+    }
+
+    rightJoin(keyA: string, operation: string, keyB: string): IQueryBuilder
+    {
+        return this.join(keyA, operation, keyB, 'RIGHT')
+    }
+
+    fullJoin(keyA: string, operation: string, keyB: string): IQueryBuilder
+    {
+        return this.join(keyA, operation, keyB, 'FULL')
+    }
+
     insert(items: Record<string, any>, options?: IInsertOptions): any
     {
         if (options?.multiple)
@@ -258,6 +291,11 @@ export default class Postgres extends Connection
 
     getQuery(type: QueryType = QueryType.SELECT): string
     {
+        function getJoins(joins: IJoin[])
+        {
+            return joins.map(item => `${ item.type } JOIN ON ${ item.keyA } ${ item.operation } ${ item.keyB }`).join(' ')
+        }
+
         const whereConfig = this.query.whereConfig
         function getWhere(where: IWhere[])
         {
@@ -268,6 +306,7 @@ export default class Postgres extends Connection
             }
             return ''
         }
+
         function getOrderBy(orderBy: string[])
         {
             if (orderBy.length)
@@ -282,10 +321,11 @@ export default class Postgres extends Connection
             case QueryType.SELECT:
 
                 query = format(
-                    'SELECT %s%s FROM %s %s %s',
+                    'SELECT %s%s FROM %s %s %s %s',
                     this.querySelect.distinct ? 'DISTINCT ' : '',
                     this.querySelect.select.length ? this.querySelect.select.join(', ') : '*',
                     this._table,
+                    getJoins(this.querySelect.joins),
                     getWhere(this.query.where),
                     getOrderBy(this.querySelect.orderBy),
                 )

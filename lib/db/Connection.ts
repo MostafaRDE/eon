@@ -92,6 +92,12 @@ export default abstract class Connection implements IConnection, IQueryBuilder
 
     abstract orderBy(...args: string[]): IQueryBuilder
 
+    abstract join(keyA: string, operation: string, keyB: string, type?: string): IQueryBuilder
+    abstract innerJoin(keyA: string, operation: string, keyB: string): IQueryBuilder
+    abstract leftJoin(keyA: string, operation: string, keyB: string): IQueryBuilder
+    abstract rightJoin(keyA: string, operation: string, keyB: string): IQueryBuilder
+    abstract fullJoin(keyA: string, operation: string, keyB: string): IQueryBuilder
+
     abstract insert(items: Record<string, any>, options?: Record<string, any>): Promise<any>
 
     abstract update(items: Record<string, any>): Promise<any>

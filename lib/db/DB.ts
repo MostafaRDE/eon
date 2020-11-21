@@ -166,6 +166,41 @@ export default class DB implements IQueryBuilder
         return _this
     }
 
+    join(keyA: string, operation: string, keyB: string, type = 'INNER'): IQueryBuilder
+    {
+        const _this = global.clone(this, this.cloneDeep)
+        _this.connection.join(keyA, operation, keyB, type)
+        return _this
+    }
+
+    innerJoin(keyA: string, operation: string, keyB: string): IQueryBuilder
+    {
+        const _this = global.clone(this, this.cloneDeep)
+        _this.connection.innerJoin(keyA, operation, keyB)
+        return _this
+    }
+
+    leftJoin(keyA: string, operation: string, keyB: string): IQueryBuilder
+    {
+        const _this = global.clone(this, this.cloneDeep)
+        _this.connection.leftJoin(keyA, operation, keyB)
+        return _this
+    }
+
+    rightJoin(keyA: string, operation: string, keyB: string): IQueryBuilder
+    {
+        const _this = global.clone(this, this.cloneDeep)
+        _this.connection.rightJoin(keyA, operation, keyB)
+        return _this
+    }
+
+    fullJoin(keyA: string, operation: string, keyB: string): IQueryBuilder
+    {
+        const _this = global.clone(this, this.cloneDeep)
+        _this.connection.fullJoin(keyA, operation, keyB)
+        return _this
+    }
+
     insert(items: Record<string, any>, options?: Record<string, any>): Promise<any>
     {
         const _this = global.clone(this, this.cloneDeep)

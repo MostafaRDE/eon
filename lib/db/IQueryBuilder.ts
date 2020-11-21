@@ -13,6 +13,14 @@ export interface IWhereConfig
     condition?: string
 }
 
+export interface IJoin
+{
+    type?: string
+    keyA: string
+    operation?: string
+    keyB: string
+}
+
 export default interface IQueryBuilder
 {
     getQuery(): string
@@ -49,7 +57,15 @@ export default interface IQueryBuilder
 
 
     // Joins
-    join(source: 'string', condition: Record<string, any>, options?: Record<string, any>): IQueryBuilder
+    join(keyA: string, operation: string, keyB: string, type?: string): IQueryBuilder
+
+    innerJoin(keyA: string, operation: string, keyB: string): IQueryBuilder
+
+    leftJoin(keyA: string, operation: string, keyB: string): IQueryBuilder
+
+    rightJoin(keyA: string, operation: string, keyB: string): IQueryBuilder
+
+    fullJoin(keyA: string, operation: string, keyB: string): IQueryBuilder
 
 
     // Mutations
