@@ -11,7 +11,7 @@
         "allowSyntheticDefaultImports": true,
         "allowJs": false,
         "checkJs": false,
-        "sourceMap": true,
+        "sourceMap": false,
         "typeRoots": [
             "./node_modules/@types",
             "./lib/typings",
