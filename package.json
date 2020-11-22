@@ -1,6 +1,6 @@
 {
     "name": "eloquent-orm-node",
-    "version": "0.1.12",
+    "version": "0.1.13",
     "description": "Eloquent ORM for Node JS",
     "main": "dist/index.js",
     "typings": "dist/index.d.js",
