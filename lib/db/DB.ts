@@ -166,6 +166,34 @@ export default class DB implements IQueryBuilder
         return _this
     }
 
+    offset(count: number): IQueryBuilder
+    {
+        const _this = global.clone(this, this.cloneDeep)
+        _this.connection.offset(count)
+        return _this
+    }
+
+    limit(count: number): IQueryBuilder
+    {
+        const _this = global.clone(this, this.cloneDeep)
+        _this.connection.limit(count)
+        return _this
+    }
+
+    skip(count: number): IQueryBuilder
+    {
+        const _this = global.clone(this, this.cloneDeep)
+        _this.connection.skip(count)
+        return _this
+    }
+
+    take(count: number): IQueryBuilder
+    {
+        const _this = global.clone(this, this.cloneDeep)
+        _this.connection.take(count)
+        return _this
+    }
+
     join(keyA: string, operation: string, keyB: string, type = 'INNER'): IQueryBuilder
     {
         const _this = global.clone(this, this.cloneDeep)

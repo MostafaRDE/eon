@@ -56,6 +56,16 @@ export default interface IQueryBuilder
     orderBy(...args: string[]): IQueryBuilder
 
 
+    // Paging
+    offset(count: number): IQueryBuilder
+
+    limit(count: number): IQueryBuilder
+
+    skip(count: number): IQueryBuilder
+
+    take(count: number): IQueryBuilder
+
+
     // Joins
     join(keyA: string, operation: string, keyB: string, type?: string): IQueryBuilder
 

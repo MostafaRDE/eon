@@ -18,6 +18,8 @@ interface IQuerySelect
     select: string[]
     orderBy: string[]
     joins: IJoin[]
+    limit?: number
+    offset?: number
 }
 
 interface IQueryInsert
@@ -213,6 +215,30 @@ export default class Postgres extends Connection
         return this
     }
 
+    offset(count: number): IQueryBuilder
+    {
+        this.querySelect.offset = count
+        return this
+    }
+
+    limit(count: number): IQueryBuilder
+    {
+        this.querySelect.limit = count
+        return this
+    }
+
+    skip(count: number): IQueryBuilder
+    {
+        this.querySelect.offset = count
+        return this
+    }
+
+    take(count: number): IQueryBuilder
+    {
+        this.querySelect.limit = count
+        return this
+    }
+
     join(keyA: string, operation: string, keyB: string, type = 'INNER'): IQueryBuilder
     {
         this.querySelect.joins.push({
@@ -314,6 +340,11 @@ export default class Postgres extends Connection
             return ''
         }
 
+        function getLimitOffset(limit: (string|number) = 'ALL', offset: (string|number) = 0)
+        {
+            return `LIMIT ${ limit }${ offset ? ` OFFSET ${ offset }` : '' }`
+        }
+
         let query = ''
 
         switch (type)
@@ -321,13 +352,14 @@ export default class Postgres extends Connection
             case QueryType.SELECT:
 
                 query = format(
-                    'SELECT %s%s FROM %s %s %s %s',
+                    'SELECT %s%s FROM %s %s %s %s %s',
                     this.querySelect.distinct ? 'DISTINCT ' : '',
                     this.querySelect.select.length ? this.querySelect.select.join(', ') : '*',
                     this._table,
                     getJoins(this.querySelect.joins),
                     getWhere(this.query.where),
                     getOrderBy(this.querySelect.orderBy),
+                    getLimitOffset(this.querySelect.limit, this.querySelect.offset),
                 )
 
                 break

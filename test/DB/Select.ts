@@ -5,6 +5,7 @@ con.table('table_name').select('*').where({ key: 'id', value: 1 }).get().then(co
 con.table('table_name').select('*').whereSimple({ id: 1 }).get().then(console.log)
 con.table('table_name').select('*').whereSimple({ id: 1 }).first().then(console.log)
 con.table('table_name').select('*').whereSimple({ id: 100000 }).first().then(console.log)
+con.table('table_name').select('*').limit(4).offset(1).orderBy('id').get().then(console.log)
 console.log(
     con.table('table_name')
         .select('*')

@@ -92,6 +92,14 @@ export default abstract class Connection implements IConnection, IQueryBuilder
 
     abstract orderBy(...args: string[]): IQueryBuilder
 
+    abstract offset(count: number): IQueryBuilder
+
+    abstract limit(count: number): IQueryBuilder
+
+    abstract skip(count: number): IQueryBuilder
+
+    abstract take(count: number): IQueryBuilder
+
     abstract join(keyA: string, operation: string, keyB: string, type?: string): IQueryBuilder
     abstract innerJoin(keyA: string, operation: string, keyB: string): IQueryBuilder
     abstract leftJoin(keyA: string, operation: string, keyB: string): IQueryBuilder
