@@ -16,9 +16,10 @@ export interface IWhereConfig
 export interface IJoin
 {
     type?: string
-    keyA: string
+    table: string
+    key: string
     operation?: string
-    keyB: string
+    value: string
 }
 
 export default interface IQueryBuilder
@@ -69,15 +70,15 @@ export default interface IQueryBuilder
 
 
     // Joins
-    join(keyA: string, operation: string, keyB: string, type?: string): IQueryBuilder
+    join(table: string, key: string, operation: string, keyB: string, type?: string): IQueryBuilder
 
-    innerJoin(keyA: string, operation: string, keyB: string): IQueryBuilder
+    innerJoin(table: string, key: string, operation: string, value: string): IQueryBuilder
 
-    leftJoin(keyA: string, operation: string, keyB: string): IQueryBuilder
+    leftJoin(table: string, key: string, operation: string, value: string): IQueryBuilder
 
-    rightJoin(keyA: string, operation: string, keyB: string): IQueryBuilder
+    rightJoin(table: string, key: string, operation: string, value: string): IQueryBuilder
 
-    fullJoin(keyA: string, operation: string, keyB: string): IQueryBuilder
+    fullJoin(table: string, key: string, operation: string, value: string): IQueryBuilder
 
 
     // Mutations

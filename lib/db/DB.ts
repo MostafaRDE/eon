@@ -201,38 +201,38 @@ export default class DB implements IQueryBuilder
         return _this
     }
 
-    join(keyA: string, operation: string, keyB: string, type = 'INNER'): IQueryBuilder
+    join(table: string, key: string, operation: string, value: string, type = 'INNER'): IQueryBuilder
     {
         const _this = global.clone(this, this.cloneDeep)
-        _this.connection.join(keyA, operation, keyB, type)
+        _this.connection.join(table, key, operation, value, type)
         return _this
     }
 
-    innerJoin(keyA: string, operation: string, keyB: string): IQueryBuilder
+    innerJoin(table: string, key: string, operation: string, value: string): IQueryBuilder
     {
         const _this = global.clone(this, this.cloneDeep)
-        _this.connection.innerJoin(keyA, operation, keyB)
+        _this.connection.innerJoin(table, key, operation, value)
         return _this
     }
 
-    leftJoin(keyA: string, operation: string, keyB: string): IQueryBuilder
+    leftJoin(table: string, key: string, operation: string, value: string): IQueryBuilder
     {
         const _this = global.clone(this, this.cloneDeep)
-        _this.connection.leftJoin(keyA, operation, keyB)
+        _this.connection.leftJoin(table, key, operation, value)
         return _this
     }
 
-    rightJoin(keyA: string, operation: string, keyB: string): IQueryBuilder
+    rightJoin(table: string, key: string, operation: string, value: string): IQueryBuilder
     {
         const _this = global.clone(this, this.cloneDeep)
-        _this.connection.rightJoin(keyA, operation, keyB)
+        _this.connection.rightJoin(table, key, operation, value)
         return _this
     }
 
-    fullJoin(keyA: string, operation: string, keyB: string): IQueryBuilder
+    fullJoin(table: string, key: string, operation: string, value: string): IQueryBuilder
     {
         const _this = global.clone(this, this.cloneDeep)
-        _this.connection.fullJoin(keyA, operation, keyB)
+        _this.connection.fullJoin(table, key, operation, value)
         return _this
     }
 

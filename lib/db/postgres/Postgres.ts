@@ -251,35 +251,36 @@ export default class Postgres extends Connection
         return this
     }
 
-    join(keyA: string, operation: string, keyB: string, type = 'INNER'): IQueryBuilder
+    join(table: string, key: string, operation: string, value: string, type = 'INNER'): IQueryBuilder
     {
         this.querySelect.joins.push({
             type,
-            keyA,
+            table,
+            key,
             operation,
-            keyB,
+            value,
         })
         return this
     }
 
-    innerJoin(keyA: string, operation: string, keyB: string): IQueryBuilder
+    innerJoin(table: string, key: string, operation: string, value: string): IQueryBuilder
     {
-        return this.join(keyA, operation, keyB, 'INNER')
+        return this.join(table, key, operation, value, 'INNER')
     }
 
-    leftJoin(keyA: string, operation: string, keyB: string): IQueryBuilder
+    leftJoin(table: string, key: string, operation: string, value: string): IQueryBuilder
     {
-        return this.join(keyA, operation, keyB, 'LEFT')
+        return this.join(table, key, operation, value, 'LEFT')
     }
 
-    rightJoin(keyA: string, operation: string, keyB: string): IQueryBuilder
+    rightJoin(table: string, key: string, operation: string, value: string): IQueryBuilder
     {
-        return this.join(keyA, operation, keyB, 'RIGHT')
+        return this.join(table, key, operation, value, 'RIGHT')
     }
 
-    fullJoin(keyA: string, operation: string, keyB: string): IQueryBuilder
+    fullJoin(table: string, key: string, operation: string, value: string): IQueryBuilder
     {
-        return this.join(keyA, operation, keyB, 'FULL')
+        return this.join(table, key, operation, value, 'FULL')
     }
 
     insert(items: Record<string, any>, options?: IInsertOptions): any
@@ -338,7 +339,7 @@ export default class Postgres extends Connection
 
         function getJoins(joins: IJoin[])
         {
-            return joins.map(item => `${ item.type } JOIN ON ${ item.keyA } ${ item.operation } ${ item.keyB }`).join(' ')
+            return joins.map(item => `${ item.type } JOIN ${ item.table } ON ${ item.key } ${ item.operation } ${ item.value }`).join(' ')
         }
 
         const whereConfig = this.query.whereConfig
