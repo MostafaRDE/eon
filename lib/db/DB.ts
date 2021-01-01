@@ -51,7 +51,7 @@ export default class DB implements IQueryBuilder
 
     ///////////////////////////////////////////
 
-    private options: IOptions
+    private readonly options: IOptions
     // @ts-ignore
     private readonly connection: Connection
 
@@ -156,6 +156,13 @@ export default class DB implements IQueryBuilder
     {
         const _this = global.clone(this, this.cloneDeep)
         _this.connection.returning(...args)
+        return _this
+    }
+
+    with(name: string, query: string, recursive?: boolean): IQueryBuilder
+    {
+        const _this = global.clone(this, this.cloneDeep)
+        _this.connection.with(name, query, recursive)
         return _this
     }
 

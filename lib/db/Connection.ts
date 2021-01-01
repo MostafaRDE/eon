@@ -90,6 +90,8 @@ export default abstract class Connection implements IConnection, IQueryBuilder
 
     abstract returning(...args: string[]): IQueryBuilder
 
+    abstract with(name: string, query: string, recursive?: boolean): IQueryBuilder
+
     abstract orderBy(...args: string[]): IQueryBuilder
 
     abstract offset(count: number): IQueryBuilder

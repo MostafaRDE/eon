@@ -51,6 +51,8 @@ export default interface IQueryBuilder
 
     returning(...args: string[]): IQueryBuilder
 
+    with(name: string, query: string, recursive?: boolean): IQueryBuilder
+
 
     // Sorting
     orderBy(...args: string[]): IQueryBuilder

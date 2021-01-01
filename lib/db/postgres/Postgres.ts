@@ -7,6 +7,11 @@ import QueryType from '../../modules/enums/QueryTypes'
 
 interface IQuery
 {
+    with?: {
+        name: string,
+        recursive?: boolean,
+        query: string,
+    },
     whereConfig: IWhereConfig
     where: IWhere[]
     returning: string[]
@@ -43,6 +48,7 @@ export default class Postgres extends Connection
     _isConnected = false
 
     query: IQuery = {
+        with: undefined,
         whereConfig: {
             condition: 'AND',
             operator: '=',
@@ -209,6 +215,12 @@ export default class Postgres extends Connection
         return this
     }
 
+    with(name: string, query: string, recursive?: boolean): IQueryBuilder
+    {
+        this.query.with = { name, recursive, query }
+        return this
+    }
+
     orderBy(...args: string[]): IQueryBuilder
     {
         args.forEach(item => this.querySelect.orderBy.push(item))
@@ -317,6 +329,13 @@ export default class Postgres extends Connection
 
     getQuery(type: QueryType = QueryType.SELECT): string
     {
+        function getWithQuery(withQuery: any)
+        {
+            if (withQuery)
+                return `WITH ${ withQuery.recursive ? 'recursive ' : '' } ${ withQuery.name } AS (${ withQuery.query }) `
+            return ''
+        }
+
         function getJoins(joins: IJoin[])
         {
             return joins.map(item => `${ item.type } JOIN ON ${ item.keyA } ${ item.operation } ${ item.keyB }`).join(' ')
@@ -352,7 +371,8 @@ export default class Postgres extends Connection
             case QueryType.SELECT:
 
                 query = format(
-                    'SELECT %s%s FROM %s %s %s %s %s',
+                    '%sSELECT %s%s FROM %s %s %s %s %s',
+                    getWithQuery(this.query.with),
                     this.querySelect.distinct ? 'DISTINCT ' : '',
                     this.querySelect.select.length ? this.querySelect.select.join(', ') : '*',
                     this._table,
