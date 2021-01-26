@@ -434,9 +434,9 @@ export default class Postgres extends Connection
                 if (err)
                 {
                     this._isConnected = false
-                    reject(err)
                     console.error('Error executing query => ', err.stack)
-                    return console.error('Error executing with query => ', query)
+                    console.error('Error executing with query => ', query)
+                    reject(err)
                 }
                 else
                 {

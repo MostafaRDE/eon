@@ -1,6 +1,6 @@
 {
     "name": "eloquent-orm-node",
-    "version": "0.3.2",
+    "version": "0.3.4",
     "description": "Eloquent ORM for Node JS",
     "main": "dist/index.js",
     "typings": "dist/index.d.js",
@@ -8,8 +8,7 @@
         "dist": "dist"
     },
     "scripts": {
-        "build:select": "tsc && node dist/test/DB/Select.js",
-        "publish": "tsc && npm publish"
+        "build:select": "tsc && node dist/test/DB/Select.js"
     },
     "repository": {
         "type": "git",
