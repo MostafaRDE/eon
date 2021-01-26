@@ -27,6 +27,13 @@ interface IQuerySelect
     offset?: number
 }
 
+enum IQueryInsertValueTypes
+{
+    IDENTIFIER,
+    LITERAL,
+    SIMPLE_STRING,
+}
+
 interface IQueryInsert
 {
     columns: string[]
@@ -36,6 +43,7 @@ interface IQueryInsert
 interface IInsertOptions
 {
     multiple: boolean
+    columnTypes?: Record<string, IQueryInsertValueTypes>
 }
 
 interface IResult
@@ -292,22 +300,52 @@ export default class Postgres extends Connection
             items.values.forEach((item: (Record<string, any> | [])) =>
             {
                 if (Array.isArray(item))
-                    this.queryInsert.values.push(item)
+                    this.queryInsert.values.push(this.formatInsertValues(item, options))
                 else
-                    this.queryInsert.values.push(this.queryInsert.columns.map(column => item[ column ]))
+                    this.queryInsert.values.push(this.formatInsertValues(this.queryInsert.columns.map(column => item[ column ]), options))
             })
-
-            if (Array.isArray(items.returning))
-                this.query.returning = items.returning
         }
         else
         {
             this.queryInsert.columns = Object.keys(items)
-            this.queryInsert.values.push(Object.values(items))
+            this.queryInsert.values.push(this.formatInsertValues(Object.values(items), options))
         }
 
         return this.raw(this.getQuery(QueryType.INSERT))
             .then((res: IResult) => this.parseResultQuery(res))
+    }
+
+    private formatInsertValues(oneRowAsArray: any[], options?: IInsertOptions)
+    {
+        if (options?.columnTypes && this.queryInsert.columns.length === oneRowAsArray.length)
+        {
+            this.queryInsert.columns.forEach((column: string, index) =>
+            {
+                let formatterSymbol = '%L'
+
+                if (options.columnTypes?.hasOwnProperty(column))
+                {
+                    switch (options.columnTypes[ column ])
+                    {
+                        case IQueryInsertValueTypes.IDENTIFIER:
+                            formatterSymbol = '%I'
+                            break
+                        case IQueryInsertValueTypes.LITERAL:
+                            formatterSymbol = '%L'
+                            break
+
+                        case IQueryInsertValueTypes.SIMPLE_STRING:
+                            formatterSymbol = '%s'
+                            break
+                    }
+                }
+
+                oneRowAsArray[ index ] = format(formatterSymbol, oneRowAsArray[ index ])
+            })
+        }
+        else oneRowAsArray = oneRowAsArray.map(item => format('%L', item))
+
+        return oneRowAsArray
     }
 
     update(items: Record<string, any>): Promise<any>
@@ -388,7 +426,7 @@ export default class Postgres extends Connection
             case QueryType.INSERT:
 
                 query = format(
-                    'INSERT INTO %s (%s) VALUES %L returning %s',
+                    'INSERT INTO %s (%s) VALUES %s returning %s',
                     this._table,
                     this.queryInsert.columns.join(', '),
                     this.queryInsert.values,
