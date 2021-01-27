@@ -327,15 +327,18 @@ export default class Postgres extends Connection
                 {
                     switch (IQueryInsertValueTypes[ options.columnTypes[ column ] ])
                     {
-                        case `${ IQueryInsertValueTypes.IDENTIFIER }`:
+                        // @ts-ignore
+                        case IQueryInsertValueTypes.IDENTIFIER:
                             formatterSymbol = '%I'
                             break
 
-                        case `${ IQueryInsertValueTypes.LITERAL }`:
+                        // @ts-ignore
+                        case IQueryInsertValueTypes.LITERAL:
                             formatterSymbol = '%L'
                             break
 
-                        case `${ IQueryInsertValueTypes.SIMPLE_STRING }`:
+                        // @ts-ignore
+                        case IQueryInsertValueTypes.SIMPLE_STRING:
                             formatterSymbol = '%s'
                             break
                     }
