@@ -166,6 +166,13 @@ export default class DB implements IQueryBuilder
         return _this
     }
 
+    groupBy(...args: string[]): IQueryBuilder
+    {
+        const _this = global.clone(this, this.cloneDeep)
+        _this.connection.groupBy(...args)
+        return _this
+    }
+
     orderBy(...args: string[]): IQueryBuilder
     {
         const _this = global.clone(this, this.cloneDeep)

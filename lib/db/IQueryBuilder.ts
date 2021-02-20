@@ -56,6 +56,8 @@ export default interface IQueryBuilder
 
 
     // Sorting
+    groupBy(...args: string[]): IQueryBuilder
+
     orderBy(...args: string[]): IQueryBuilder
 
 

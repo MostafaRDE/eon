@@ -21,6 +21,7 @@ interface IQuerySelect
 {
     distinct: boolean
     select: string[]
+    groupBy: string[]
     orderBy: string[]
     joins: IJoin[]
     limit?: number
@@ -68,6 +69,7 @@ export default class Postgres extends Connection
     querySelect: IQuerySelect = {
         distinct: false,
         select: [],
+        groupBy: [],
         orderBy: [],
         joins: [],
     }
@@ -226,6 +228,12 @@ export default class Postgres extends Connection
     with(name: string, query: string, recursive?: boolean): IQueryBuilder
     {
         this.query.with = { name, recursive, query }
+        return this
+    }
+
+    groupBy(...args: string[]): IQueryBuilder
+    {
+        args.forEach(item => this.querySelect.groupBy.push(item))
         return this
     }
 
@@ -395,6 +403,13 @@ export default class Postgres extends Connection
             return ''
         }
 
+        function getGroupBy(groupBy: string[])
+        {
+            if (groupBy.length)
+                return `GROUP BY ${ groupBy.join(', ') }`
+            return ''
+        }
+
         function getOrderBy(orderBy: string[])
         {
             if (orderBy.length)
@@ -414,13 +429,14 @@ export default class Postgres extends Connection
             case QueryType.SELECT:
 
                 query = format(
-                    '%sSELECT %s%s FROM %s %s %s %s %s',
+                    '%sSELECT %s%s FROM %s %s %s %s %s %s',
                     getWithQuery(this.query.with),
                     this.querySelect.distinct ? 'DISTINCT ' : '',
                     this.querySelect.select.length ? this.querySelect.select.join(', ') : '*',
                     this._table,
                     getJoins(this.querySelect.joins),
                     getWhere(this.query.where),
+                    getGroupBy(this.querySelect.groupBy),
                     getOrderBy(this.querySelect.orderBy),
                     getLimitOffset(this.querySelect.limit, this.querySelect.offset),
                 )
